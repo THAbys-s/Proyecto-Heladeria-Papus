@@ -1,3 +1,4 @@
+
 from flask import Flask, url_for, render_template, request, jsonify
 import sqlite3
 app = Flask(__name__)
@@ -50,4 +51,3 @@ def buscar_usuario():
     cerrarConexion()
     usuarios = [dict(row) for row in res]
     return jsonify(usuarios)
-
