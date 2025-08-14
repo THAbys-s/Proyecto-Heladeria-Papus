@@ -4,6 +4,7 @@
     <title>Lista de Usuarios</title>
   </head>
   <body>
+    <div></div>
     <input type="search" id="buscador" placeholder="Buscar sabor..." />
     <ul id="resultados"></ul>
 
@@ -23,6 +24,7 @@
         );
         //EncodeURIComponent básicamente convierte los caracteres incorrectos en un formato
         //válido para una URL.
+
         const data = await res.json();
         resultados.innerHTML = ""; // Limpia los resultados anteriores.
         data.forEach((sabor) => {
