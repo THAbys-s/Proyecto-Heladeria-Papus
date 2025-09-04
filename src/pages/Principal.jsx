@@ -1,4 +1,3 @@
-
 import Principal from "../components/principal/Principal";
 
 const PrincipalPage = () => {
