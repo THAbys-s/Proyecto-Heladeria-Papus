@@ -35,9 +35,13 @@ function BuscarSabores() {
         placeholder="Buscar sabor..."
       />
       <ul>
-        {resultados.map((sabor) => (
-          <li key={sabor.nombre_sabor}>{sabor.nombre_sabor}</li>
-        ))}
+        {resultados.length === 0 ? (
+          <li>No se encontraron sabores.</li>
+        ) : (
+          resultados.map((sabor) => (
+            <li key={sabor.nombre_sabor}>{sabor.nombre_sabor}</li>
+          ))
+        )}
       </ul>
     </div>
   );

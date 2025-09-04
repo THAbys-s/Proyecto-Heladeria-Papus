@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lista de Usuarios</title>
+  </head>
+  <body>
+    <div></div>
+    <input type="search" id="buscador" placeholder="Buscar sabor..." />
+    <ul id="resultados"></ul>
+
+    <script>
+      const input = document.getElementById("buscador");
+      const resultados = document.getElementById("resultados");
+
+      input.addEventListener("input", async function () {
+        const query = input.value;
+        if (query.length === 0) {
+          // Si no se escribió nada, deja vacio el resultado.
+          resultados.innerHTML = "";
+          return;
+        }
+        const res = await fetch(
+          `/mysql/buscar/sabores?nombre=${encodeURIComponent(query)}`
+        );
+        //EncodeURIComponent básicamente convierte los caracteres incorrectos en un formato
+        //válido para una URL.
+
+        const data = await res.json();
+        resultados.innerHTML = ""; // Limpia los resultados anteriores.
+        data.forEach((sabor) => {
+          const li = document.createElement("li");
+          li.textContent = sabor.nombre_sabor; // Agrega el nombre del sabor al elemento de la lista.
+          resultados.appendChild(li); // Agrega los resultados a una lista.
+        });
+      });
+    </script>
+  </body>
+</html>

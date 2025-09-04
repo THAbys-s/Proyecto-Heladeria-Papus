@@ -33,8 +33,20 @@ def test_mysql():
     return jsonify(resultado)
 
 @app.route('/mysql/buscar/sabores')
-def datos_por_nombre():
-    return render_template("temp.html")
+def buscar_sabores():
+    nombre = request.args.get('nombre')
+    if nombre is None:
+        return render_template("temp.html")
+    conexion = abrirConexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s",
+        (f"%{nombre}%",)
+    )
+    res = cursor.fetchall()
+    cerrarConexion()
+    # Devuelve JSON aunque esté vacío
+    return jsonify(res)
 
 @app.route('/mysql/buscar')
 def buscar_usuario():
