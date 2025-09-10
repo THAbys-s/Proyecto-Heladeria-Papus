@@ -1,32 +1,35 @@
 from flask import Flask, url_for, render_template, request, jsonify
-import mysql.connector  # Cambia sqlite3 por mysql.connector
+import pymysql
 
 app = Flask(__name__)
 
 db = None
 
+# Abrir la conexión a la base de datos
 def abrirConexion():
     global db
-    db = mysql.connector.connect(
-        host="10.9.120.5",
-        port=3306,
-        user="heladeria",         # Cambia por tu usuario MySQL
-        password="papus1234",  # Cambia por tu contraseña MySQL
-        database="heladeria_papus"
-    )
+    if db is None or db.open == 0:  # Verificar si la conexión ya está cerrada
+        db = pymysql.connect(
+            host="10.9.120.5",
+            port=3306,
+            user="heladeria",
+            password="papus1234",
+            database="heladeria_papus",
+            cursorclass=pymysql.cursors.DictCursor
+        )
     return db
 
+# Cerrar la conexión
 def cerrarConexion():
     global db
     if db is not None:
         db.close()
-        db = None
+        db = None  # Marcar la conexión como cerrada
 
 @app.route("/mysql/test")
 def test_mysql():
-    global db
     conexion = abrirConexion()
-    cursor = conexion.cursor(dictionary=True)
+    cursor = conexion.cursor()
     cursor.execute('SELECT * FROM bocadillos')
     resultado = cursor.fetchall()
     cerrarConexion()
@@ -34,27 +37,28 @@ def test_mysql():
 
 @app.route('/mysql/buscar/sabores')
 def buscar_sabores():
-    nombre = request.args.get('nombre')
-    if nombre is None:
-        return render_template("temp.html")
     conexion = abrirConexion()
-    cursor = conexion.cursor(dictionary=True)
-    cursor.execute(
-        "SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s",
-        (f"%{nombre}%",)
-    )
+    cursor = conexion.cursor()
+    cursor.execute("SELECT nombre_sabor FROM sabores")
     res = cursor.fetchall()
     cerrarConexion()
-    # Devuelve JSON aunque esté vacío
+
+    # Verificar la estructura de la respuesta antes de devolverla
+    print("Sabores:", res)
     return jsonify(res)
 
 @app.route('/mysql/buscar')
 def buscar_usuario():
     nombre = request.args.get('nombre', '')
     conexion = abrirConexion()
-    cursor = conexion.cursor(dictionary=True)
+    cursor = conexion.cursor()
     cursor.execute("SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s", (f"%{nombre}%",))
     res = cursor.fetchall()
     cerrarConexion()
-    usuarios = [dict(row) for row in res]
-    return jsonify(usuarios)
+
+    # Verificar la estructura de la respuesta antes de devolverla
+    print("Resultado búsqueda:", res)
+    return jsonify(res)
+
+if __name__ == "__main__":
+    app.run(debug=True)

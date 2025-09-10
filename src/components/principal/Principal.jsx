@@ -19,8 +19,11 @@ const Principal = () => {
               Busqueda de Sabores
             </Link>
 
-            <div className="card"> Capelinas</div>
-            <div className="card"> Bombones</div>
+            <div className="card">Capelinas</div>
+            <div className="card">Bombones</div>
+            <Link to="/sabores" className="card">
+              Sabores
+            </Link>
           </div>
         </section>
       </main>

@@ -4,6 +4,7 @@ import PaginaPrincipalPage from "./pages/Principal";
 import BuscarSabores from "./pages/BuscarSabores";
 import LoadingPage from "./pages/Loading";
 import NotFound from "./pages/NoFueEncontrado";
+import Sabores from "./components/sabores/Sabores";
 
 function App() {
   return (
@@ -11,9 +12,11 @@ function App() {
       <Routes>
         {/* Redirige raíz a /home */}
         <Route path="/" element={<Navigate to="/home" />} />
-
         <Route path="/home" element={<PaginaPrincipalPage />} />
+
         <Route path="/buscar" element={<BuscarSabores />} />
+        <Route path="/sabores" element={<Sabores />} />
+        {/* Hacer que funcione antes de cada página */}
         <Route path="/loading" element={<LoadingPage />} />
 
         {/* Página 404 */}
