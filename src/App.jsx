@@ -1,19 +1,22 @@
+// src/App.jsx
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import PaginaPrincipalPage from "./pages/Principal";
-import BuscarSabores from "./pages/BuscarSabores";
-import LoadingPage from "./pages/Loading";
+import { Routes, Route } from "react-router-dom";
+import { Home } from "./components/home/Home";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/home" element={<PaginaPrincipalPage />} />
-        <Route path="/buscar" element={<BuscarSabores />} />
-        {/* Agrega más rutas aquí */}
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/home" element={<Home />} />
+      <Route path="/principal" element={<HomeClientes />} />
+    </Routes>
   );
 }
+
+/*  
+    #FF6E72 Rosa fuerte
+    #FFA9AC Rosa claro
+    #65B7DA Azul claro
+    #EEEEEE Blanco
+*/
 
 export default App;
