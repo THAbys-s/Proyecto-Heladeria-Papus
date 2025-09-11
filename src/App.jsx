@@ -6,6 +6,15 @@ import LoadingPage from "./pages/Loading";
 import NotFound from "./pages/NoFueEncontrado";
 import Sabores from "./components/sabores/Sabores";
 
+/*
+#FF6E72
+#FFA9AC
+#65B7DA
+#FCBA78
+#DD7E6B
+#FFF7BA
+*/
+
 function App() {
   return (
     <BrowserRouter>
