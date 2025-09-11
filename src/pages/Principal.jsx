@@ -1,7 +1,7 @@
 import Principal from "../components/principal/Principal";
 
 const PrincipalPage = () => {
-	return <Principal />;
+  return <Principal />;
 };
 
 export default PrincipalPage;

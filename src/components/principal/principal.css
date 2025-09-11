@@ -1,40 +1,85 @@
-header {
-  background-color: #65b7da;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
-}
-section {
-  font-family: Arial, sans-serif;
-  background-color: #eeeeee;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
+.principal-container {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  background-color: #fdfdfd;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-footer {
-  background-color: #ff6e72;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
+.principal-header {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background: linear-gradient(135deg, #55a4ab, #a3d7d5);
+  color: white;
+  border-bottom: 4px solid #cc6310;
 }
 
-h1,
-h2 {
-  color: #ff6e72;
-  font-weight: 900;
+.titulo {
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
 }
 
-h3 {
-  color: #000000;
-  font-weight: 900;
+.subtitulo {
+  font-weight: 400;
+  font-size: 1.2rem;
+  color: #f5e97d;
 }
 
-p,
-li {
-  color: black;
+/* ---------- MAIN ---------- */
+.principal-main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-/*  
-    #FF6E72 Rosa fuerte
-    #FFA9AC Rosa claro
-    #65B7DA Azul claro
-    #EEEEEE Blanco
-*/
+.sabores-section {
+  text-align: center;
+  max-width: 900px;
+  width: 100%;
+}
+
+.sabores-section h2 {
+  font-size: 1.8rem;
+  color: #cc6310;
+  margin-bottom: 2rem;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 1.8rem;
+  border-radius: 16px;
+  border: 2px solid #df807d;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  max-width: 220px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: #55a4ab;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.principal-footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #df807d;
+  color: white;
+  font-size: 0.95rem;
+  border-top: 4px solid #55a4ab;
+}

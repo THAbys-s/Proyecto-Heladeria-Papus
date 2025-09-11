@@ -1,27 +1,26 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
-import PrincipalPage from "./pages/Principal";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import PaginaPrincipalPage from "./pages/Principal";
+import BuscarSabores from "./pages/BuscarSabores";
 import LoadingPage from "./pages/Loading";
+import NotFound from "./pages/NoFueEncontrado";
+import Sabores from "./components/sabores/Sabores";
 
 function App() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000); // Cuando pasan los dos segundos, setea loading a false
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return <LoadingPage />;
-  }
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/home" element={<PrincipalPage />} />
+        {/* Redirige raíz a /home */}
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/home" element={<PaginaPrincipalPage />} />
+
+        <Route path="/buscar" element={<BuscarSabores />} />
+        <Route path="/sabores" element={<Sabores />} />
+        {/* Hacer que funcione antes de cada página */}
+        <Route path="/loading" element={<LoadingPage />} />
+
+        {/* Página 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
