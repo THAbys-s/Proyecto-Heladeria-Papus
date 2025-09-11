@@ -48,6 +48,7 @@ function App() {
             </PageWithLoading>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

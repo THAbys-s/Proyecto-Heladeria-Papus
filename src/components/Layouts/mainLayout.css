@@ -1,0 +1,35 @@
+/* Contenedor principal del layout */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* asegura que el layout llene la pantalla */
+}
+
+/* Navbar fijo arriba */
+.main-layout .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  z-index: 1000;
+}
+
+/* Contenido principal */
+.main-content {
+  flex: 1; /* ocupa todo el espacio entre navbar y footer */
+  padding-top: 60px; /* altura del navbar */
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+  overflow: auto; /* permite scroll si la página es larga */
+}
+
+/* Footer siempre al final */
+.main-footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #df807d;
+  color: white;
+  border-top: 4px solid #55a4ab;
+}
