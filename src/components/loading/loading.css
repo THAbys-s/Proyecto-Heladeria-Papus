@@ -1,3 +1,14 @@
+/* Fade out de la animación */
+.loop-wrapper {
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+
+.loop-wrapper.fade-out {
+  opacity: 0;
+  pointer-events: none; /* evita interacción mientras se desvanece */
+}
+
 /* Palos que sostienen el helado */
 .palos {
   position: absolute;

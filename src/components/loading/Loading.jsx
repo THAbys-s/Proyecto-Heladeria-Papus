@@ -1,19 +1,20 @@
 import "./loading.css";
 
-const Loading = () => {
+const Loading = ({ fade }) => {
   return (
-    <div class="loop-wrapper">
-      <div class="mountain"></div>
-      <div class="hill"></div>
-      <div class="tree"></div>
-      <div class="tree"></div>
-      <div class="tree"></div>
-      <div class="rock"></div>
-      <div class="truck"></div>
-      <div class="wheels"></div>
-      <div class="helado"></div>
-      <div class="palos"></div>
+    <div className={`loop-wrapper ${fade ? "fade-out" : ""}`}>
+      <div className="mountain"></div>
+      <div className="hill"></div>
+      <div className="tree"></div>
+      <div className="tree"></div>
+      <div className="tree"></div>
+      <div className="rock"></div>
+      <div className="truck"></div>
+      <div className="wheels"></div>
+      <div className="helado"></div>
+      <div className="palos"></div>
     </div>
   );
 };
+
 export default Loading;

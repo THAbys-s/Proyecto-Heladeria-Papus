@@ -5,6 +5,7 @@ import BuscarSabores from "./pages/BuscarSabores";
 import LoadingPage from "./pages/Loading";
 import NotFound from "./pages/NoFueEncontrado";
 import Sabores from "./components/sabores/Sabores";
+import PageWithLoading from "./components/loading/PageWithLoading";
 
 /*
 #FF6E72
@@ -21,15 +22,32 @@ function App() {
       <Routes>
         {/* Redirige raíz a /home */}
         <Route path="/" element={<Navigate to="/home" />} />
-        <Route path="/home" element={<PaginaPrincipalPage />} />
+        <Route
+          path="/home"
+          element={
+            <PageWithLoading>
+              <PaginaPrincipalPage />
+            </PageWithLoading>
+          }
+        />
 
-        <Route path="/buscar" element={<BuscarSabores />} />
-        <Route path="/sabores" element={<Sabores />} />
-        {/* Hacer que funcione antes de cada página */}
-        <Route path="/loading" element={<LoadingPage />} />
+        <Route
+          path="/buscar"
+          element={
+            <PageWithLoading>
+              <BuscarSabores />
+            </PageWithLoading>
+          }
+        />
 
-        {/* Página 404 */}
-        <Route path="*" element={<NotFound />} />
+        <Route
+          path="/sabores"
+          element={
+            <PageWithLoading>
+              <Sabores />
+            </PageWithLoading>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
