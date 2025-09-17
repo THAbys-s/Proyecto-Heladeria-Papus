@@ -27,20 +27,24 @@ const Principal = () => {
         <section className="sabores-section">
           <h2> Un vistazo a nuestros sabores más tentadores </h2>
           <div className="cards-container">
-            <Link to="/buscar" className="card">
-              Busqueda de Sabores
-            </Link>
-
             <Link to="/sabores" className="card">
               Sabores
+            </Link>
+            <Link to="/sabores extravagantes" className="card">
+              Especiales
+            </Link>
+            <Link to="/bocadillos" className="card">
+              Bocadillos
+            </Link>
+            <Link to="/salsas" className="card">
+              Salsas
+            </Link>
+            <Link to="/cucuruchos" className="card">
+              Cucuruchos
             </Link>
           </div>
         </section>
       </main>
-
-      <footer className="principal-footer">
-        <p>&copy; 2025 Heladería Papus. Todos los derechos reservados.</p>
-      </footer>
     </div>
   );
 };

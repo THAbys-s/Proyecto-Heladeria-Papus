@@ -2,10 +2,11 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import PaginaPrincipalPage from "./pages/Principal";
 import BuscarSabores from "./pages/BuscarSabores";
-import LoadingPage from "./pages/Loading";
 import NotFound from "./pages/NoFueEncontrado";
-import Sabores from "./components/sabores/Sabores";
-import PageWithLoading from "./components/loading/PageWithLoading";
+import Sabores from "./components/Sabores/Sabores";
+import PageWithLoading from "./components/Loading/PageWithLoading";
+import MainLayout from "./components/Layouts/MainLayout";
+import Nosotros from "./components/Nosotros/Nosotros";
 
 /*
 #FF6E72
@@ -26,7 +27,9 @@ function App() {
           path="/home"
           element={
             <PageWithLoading>
-              <PaginaPrincipalPage />
+              <MainLayout>
+                <PaginaPrincipalPage />
+              </MainLayout>
             </PageWithLoading>
           }
         />
@@ -35,7 +38,9 @@ function App() {
           path="/buscar"
           element={
             <PageWithLoading>
-              <BuscarSabores />
+              <MainLayout>
+                <BuscarSabores />
+              </MainLayout>
             </PageWithLoading>
           }
         />
@@ -44,7 +49,20 @@ function App() {
           path="/sabores"
           element={
             <PageWithLoading>
-              <Sabores />
+              <MainLayout>
+                <Sabores />
+              </MainLayout>
+            </PageWithLoading>
+          }
+        />
+
+        <Route
+          path="/nosotros"
+          element={
+            <PageWithLoading>
+              <MainLayout>
+                <Nosotros />
+              </MainLayout>
             </PageWithLoading>
           }
         />

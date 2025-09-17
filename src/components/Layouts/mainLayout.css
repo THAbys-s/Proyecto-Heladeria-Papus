@@ -29,7 +29,21 @@
 .main-footer {
   text-align: center;
   padding: 1rem;
-  background-color: #df807d;
-  color: white;
-  border-top: 4px solid #55a4ab;
+  background-color: #ffa9ac;
+  color: black;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 30px 10px;
+  width: 100%;
+  border-top: grey 1px solid;
+}
+
+p {
+  margin: 5px;
+}
+
+a img {
+  width: 20px;
+  height: 20px;
+  margin-top: 15px; /* separa la imagen del texto */
 }

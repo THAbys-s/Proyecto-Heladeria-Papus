@@ -2,39 +2,112 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 100%; /* ocupa todo el ancho */
   height: 60px;
   background-color: #ff6e72;
-  color: white;
   border-bottom: 2px solid #dd7e6b;
+  color: white;
   z-index: 1000;
   display: flex;
-  justify-content: space-between; /* logo a la izquierda, menú a la derecha */
-  align-items: center;
-  padding: 0 2rem;
+  justify-content: center; /* centra el contenedor */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   font-weight: 600;
+}
+
+/* Contenedor interno con ancho máximo */
+.navbar-container {
+  width: 100%;
+  max-width: 1280px; /* límite de ancho */
+  display: flex;
+  justify-content: space-between; /* logo izquierda, menú derecha */
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.navbar-logo a {
+  color: black;
+  text-decoration: none;
+  font-size: 1.25rem;
 }
 
 .navbar-menu {
   list-style: none;
   display: flex;
   gap: 1.5rem;
+  justify-content: center; /* centra todo el menú dentro del navbar */
+  margin: 0;
+  padding: 0;
 }
 
-.navbar-menu li a {
+ul {
   color: white;
   text-decoration: none;
   transition: color 0.2s;
 }
 
-.navbar-menu li a:hover {
-  color: #fff7ba;
+li a:hover {
+  color: black;
+  font-weight: 450;
 }
 
-.navbar-logo a {
-  color: white;
-  text-decoration: none;
-  font-size: 1.3rem;
-  font-weight: 700;
+/* Contenedor del dropdown */
+.menu-item {
+  position: relative; /* importante para que el dropdown se posicione respecto al link */
+}
+
+.dropdown {
+  position: absolute;
+  top: 55px; /* debajo del navbar */
+  left: 50%; /* empieza en el centro del item */
+  transform: translate(
+    -50%,
+    -10px
+  ); /* centrado horizontal + desplazamiento inicial */
+  background-color: white;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  width: 200px;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.menu-item:hover .dropdown {
+  opacity: 1;
+  transform: translate(-50%, 0); /* centrado + aparece suavemente */
+  pointer-events: auto;
+}
+
+/* Que la imagen ocupe todo el cuadro */
+.dropdown img {
+  width: 100%;
+  display: block;
+}
+
+.navbar-card-deco {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 2px solid #ffa9ac;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  color: #ff6e72;
+  padding: 0.5rem 1rem;
+  display: inline-block; /* para que no ocupe todo el li */
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+}
+
+.navbar-card-deco:hover {
+  transform: translateY(-4px);
+  border-color: #ff6e72;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
+  cursor: default; /* no es clickeable */
+}
+
+.navbar-logo img {
+  width: 130px;
+  height: 45px;
+  /*object-fit: contain; /* para que no se deforme */
 }
