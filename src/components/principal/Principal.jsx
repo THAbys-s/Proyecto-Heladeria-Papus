@@ -18,6 +18,8 @@ const Principal = () => {
             <Link to="/buscar" className="card">
               Busqueda de Sabores
             </Link>
+            <div className="card">Capelinas</div>
+            <div className="card">Capelinas</div>
 
             <div className="card">Capelinas</div>
             <div className="card">Bombones</div>
