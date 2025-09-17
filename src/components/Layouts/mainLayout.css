@@ -22,7 +22,7 @@
   padding-left: 2rem;
   padding-right: 2rem;
   box-sizing: border-box;
-  overflow: auto; /* permite scroll si la página es larga */
+  overflow: scroll; /* permite scroll si la página es larga */
 }
 
 /* Footer siempre al final */
