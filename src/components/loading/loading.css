@@ -60,7 +60,6 @@
 
 body {
   background: #9ee1fc;
-  overflow: hidden;
   font-family: "Open Sans", sans-serif;
 }
 .loop-wrapper {
@@ -69,7 +68,6 @@ body {
   display: block;
   width: 600px;
   height: 250px;
-  overflow: hidden;
   border-bottom: 3px solid #969696;
   color: #969696;
 }
