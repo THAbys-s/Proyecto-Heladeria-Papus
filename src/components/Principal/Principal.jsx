@@ -27,6 +27,9 @@ const Principal = () => {
         <section className="sabores-section">
           <h2> Un vistazo a nuestros sabores más tentadores </h2>
           <div className="cards-container">
+            <Link to="/buscar" className="card">
+              Busqueda de Sabores
+            </Link>
             <Link to="/sabores" className="card">
               Sabores
             </Link>
