@@ -7,6 +7,10 @@ import Sabores from "./components/Sabores/Sabores";
 import PageWithLoading from "./components/Loading/PageWithLoading";
 import MainLayout from "./components/Layouts/MainLayout";
 import Nosotros from "./components/Nosotros/Nosotros";
+import Sabores from "./components/sabores/Sabores";
+import LoginPage from "./pages/Login";
+import RegisterPage from "./pages/Register";
+import { AuthProvider } from "./components/auth/Auth";
 
 /*
 #FF6E72
@@ -19,56 +23,64 @@ import Nosotros from "./components/Nosotros/Nosotros";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Redirige raíz a /home */}
-        <Route path="/" element={<Navigate to="/home" />} />
-        <Route
-          path="/home"
-          element={
-            <PageWithLoading>
-              <MainLayout>
-                <PaginaPrincipalPage />
-              </MainLayout>
-            </PageWithLoading>
-          }
-        />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Redirige raíz a /home */}
+          <Route path="/" element={<Navigate to="/home" />} />
+          <Route
+            path="/home"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <PaginaPrincipalPage />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          />
+          {/* Ruta de Busqueda */}
+          <Route
+            path="/buscar"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <BuscarSabores />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          />
+          {/* Ruta preview de Sabores */}
+          <Route
+            path="/sabores"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <Sabores />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          />
+          {/* Información de Nosotros */}
+          <Route
+            path="/nosotros"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <Nosotros />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          />
 
-        <Route
-          path="/buscar"
-          element={
-            <PageWithLoading>
-              <MainLayout>
-                <BuscarSabores />
-              </MainLayout>
-            </PageWithLoading>
-          }
-        />
+          {/* Página 404 */}
+          <Route path="*" element={<NotFound />} />
 
-        <Route
-          path="/sabores"
-          element={
-            <PageWithLoading>
-              <MainLayout>
-                <Sabores />
-              </MainLayout>
-            </PageWithLoading>
-          }
-        />
-
-        <Route
-          path="/nosotros"
-          element={
-            <PageWithLoading>
-              <MainLayout>
-                <Nosotros />
-              </MainLayout>
-            </PageWithLoading>
-          }
-        />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+          {/*Rutas de Login, Register y Auth */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
