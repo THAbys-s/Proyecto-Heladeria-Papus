@@ -1,15 +1,34 @@
 from flask import Flask, url_for, render_template, request, jsonify
 
-import pymysql
+import pymysql, os
 
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from dotenv import load_dotenv
+
+from flask_cors import CORS
+
+load_dotenv(".env/development.env")
 
 app = Flask(__name__)
 
 db = None
+
+# Clave secreta de la API.
+
+app.secret_key = os.getenv("SECRET_KEY")
+
+app.config.update(
+    SESSION_COOKIE_SAMESITE="None",
+    SESSION_COOKIE_SECURE=False  # solo desarrollo
+)
+
+
+# CORS Cookie.
+
+CORS(app,resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 #
 # RUTAS DE PRUEBA Y CONEXIÓN DB EN LA NUBE.
@@ -19,13 +38,16 @@ db = None
 # Abrir la conexión a la base de datos
 def abrirConexion():
     global db
-    if db is None or db.open == 0:  # Verificar si la conexión ya está cerrada
+    if db is None or not db.open:
+        
+        port = int(os.getenv("DB_PORT", 3306))
+
         db = pymysql.connect(
-            host="10.9.120.5",
-            port=3306,
-            user="heladeria",
-            password="papus1234",
-            database="heladeria_papus",
+            host=os.getenv("DB_HOST"),
+            port=port,
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
             cursorclass=pymysql.cursors.DictCursor
         )
     return db
@@ -81,7 +103,7 @@ if __name__ == "__main__":
 
 class User(UserMixin):
     def __init__(self, id, nombre, password_hash):
-        self.id = id
+        self.id = str(id)  # <-- importante
         self.nombre = nombre
         self.password_hash = password_hash
 
@@ -136,8 +158,11 @@ def login():
     data = request.get_json()
     nombre = data['nombre']
     password = data['password']
-
+    
+    print("Usuario buscado:", nombre)
     user = User.get_by_nombre(nombre)
+    print("Usuario encontrado:", user)
+
     if user and check_password_hash(user.password_hash, password):
         login_user(user)
         return jsonify({'message': 'Logged in'}), 200
@@ -154,15 +179,18 @@ def logout():
 def protected():
     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
 
-
 #
 # FLASK LOGIN - CONFIGURACIÓN
 #
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+
+login_manager.login_view = None  
+login_manager.login_message = None  
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
+

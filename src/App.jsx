@@ -7,7 +7,6 @@ import Sabores from "./components/Sabores/Sabores";
 import PageWithLoading from "./components/Loading/PageWithLoading";
 import MainLayout from "./components/Layouts/MainLayout";
 import Nosotros from "./components/Nosotros/Nosotros";
-import Sabores from "./components/sabores/Sabores";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import { AuthProvider } from "./components/auth/Auth";
