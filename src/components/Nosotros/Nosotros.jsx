@@ -5,7 +5,7 @@ const Nosotros = () => {
   return (
     <div>
       <h1>¡Dulzura pura!</h1>
-      <h2>Un vistazo a nuestros sabores mas tentadores</h2>
+      <h2>¡Un vistazo a nuestros sabores mas tentadores!</h2>
 
       <div className="nosotros-imagenes">
         <div className="postres-bombones">
