@@ -1,4 +1,4 @@
-import Principal from "../components/principal/Principal";
+import Principal from "../components/Principal/Principal";
 
 const PrincipalPage = () => {
   return <Principal />;
