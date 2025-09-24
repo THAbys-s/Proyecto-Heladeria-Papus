@@ -39,12 +39,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (nombre, email, password) => {
-    const res = await axios.post(`${API_URL}/api/register`, {
-      nombre,
-      email,
-      password,
-    });
-    return res.status === 201;
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/register`,
+        { nombre, email, password },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      return res.status === 201;
+    } catch (err) {
+      alert("Error en register:", err.response?.data || err.message);
+      return false;
+    }
   };
 
   return (

@@ -10,14 +10,17 @@ from dotenv import load_dotenv
 
 from flask_cors import CORS
 
+from functools import wraps
+
 load_dotenv(".env/development.env")
 
 app = Flask(__name__)
 
 db = None
 
-# Clave secreta de la API.
-
+#                          #
+# Clave secreta de la API. #
+#                          #
 app.secret_key = os.getenv("SECRET_KEY")
 
 app.config.update(
@@ -25,14 +28,16 @@ app.config.update(
     SESSION_COOKIE_SECURE=False  # solo desarrollo
 )
 
-
-# CORS Cookie.
+#              #
+# CORS Cookie. #
+#              #
 
 CORS(app,resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
-#
-# RUTAS DE PRUEBA Y CONEXIÓN DB EN LA NUBE.
-#
+
+#                                           #
+# RUTAS DE PRUEBA Y CONEXIÓN DB EN LA NUBE. #
+#                                           #
 
 
 # Abrir la conexión a la base de datos
@@ -97,15 +102,34 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
-#
-# MANEJO DEL LOGIN - CLASES
-#
+#                                                #
+# DECORADOR (SEGURIDAD DE RUTAS [LOGIN Y ROLES]) #
+#                                                #
+
+
+def roles_required(*allowed_roles):
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return jsonify({"error": "No autenticado"}), 401
+            if current_user.rol not in allowed_roles:
+                return jsonify({"error": "Acceso denegado"}), 403
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper
+
+
+#                           #
+# MANEJO DEL LOGIN - CLASES #
+#                           #
 
 class User(UserMixin):
-    def __init__(self, id, nombre, password_hash):
-        self.id = str(id)  # <-- importante
+    def __init__(self, id, nombre, password_hash, rol='user'):
+        self.id = str(id)
         self.nombre = nombre
         self.password_hash = password_hash
+        self.rol = rol
 
     @staticmethod
     def get(user_id):
@@ -115,7 +139,7 @@ class User(UserMixin):
         result = cursor.fetchone()
         cerrarConexion()
         if result:
-            return User(result['id'], result['nombre'], result['password'])
+            return User(result['id'], result['nombre'], result['password'], result.get('rol', 'user'))
         return None
 
     @staticmethod
@@ -126,13 +150,13 @@ class User(UserMixin):
         result = cursor.fetchone()
         cerrarConexion()
         if result:
-            return User(result['id'], result['nombre'], result['password'])
+            return User(result['id'], result['nombre'], result['password'], result.get('rol', 'user'))
         return None
 
 
-#
-# RUTAS DE AUTENTICACIÓN, REGISTRO Y LOGIN.
-#
+#                                           #
+# RUTAS DE AUTENTICACIÓN, REGISTRO Y LOGIN. #
+#                                           #
 
 
 @app.route('/api/register', methods=['POST'])
@@ -176,12 +200,13 @@ def logout():
 
 @app.route('/api/protected')
 @login_required
+@roles_required('usuario')
 def protected():
     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
 
-#
-# FLASK LOGIN - CONFIGURACIÓN
-#
+#                             #
+# FLASK LOGIN - CONFIGURACIÓN #
+#                             #
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -192,5 +217,8 @@ login_manager.login_message = None
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
+
+
 
 
