@@ -7,7 +7,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": "http://localhost:5000", // redirige /api de React hacia Flask
+      "/api": {
+        target: "http://127.0.0.1:5000",
+        changeOrigin: true,
+        secure: false,
+      },
     },
+    host: "127.0.0.1", // fuerza Vite a servir desde 127.0.0.1
+    port: 5173,
   },
 });

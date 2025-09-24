@@ -16,17 +16,23 @@ load_dotenv(".env/development.env")
 
 app = Flask(__name__)
 
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "supersecretkey")
+
+
 db = None
 
 #                          #
 # Clave secreta de la API. #
 #                          #
-app.secret_key = os.getenv("SECRET_KEY")
 
 app.config.update(
-    SESSION_COOKIE_SAMESITE="None",
-    SESSION_COOKIE_SECURE=False  # solo desarrollo
+    SESSION_COOKIE_SAMESITE=None,
+    REMEMBER_COOKIE_SAMESITE=None,
+    SESSION_COOKIE_SECURE=False,
+    REMEMBER_COOKIE_SECURE=False
 )
+
+
 
 #              #
 # CORS Cookie. #
@@ -61,8 +67,13 @@ def abrirConexion():
 def cerrarConexion():
     global db
     if db is not None:
-        db.close()
-        db = None  # Marcar la conexión como cerrada
+        try:
+            if db.open:  # <-- solo cerrar si está abierta
+                db.close()
+        except AttributeError:
+            pass  # db no tiene open (por si algo extraño pasa)
+        finally:
+            db = None
 
 @app.route("/mysql/test")
 def test_mysql():
@@ -188,7 +199,7 @@ def login():
     print("Usuario encontrado:", user)
 
     if user and check_password_hash(user.password_hash, password):
-        login_user(user)
+        login_user(user, remember=True)
         return jsonify({'message': 'Logged in'}), 200
     return jsonify({'error': 'Credenciales inválidas'}), 401
 
@@ -200,7 +211,7 @@ def logout():
 
 @app.route('/api/protected')
 @login_required
-@roles_required('usuario')
+@roles_required('admin')
 def protected():
     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
 
