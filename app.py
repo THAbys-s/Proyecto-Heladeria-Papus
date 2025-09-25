@@ -16,7 +16,7 @@ load_dotenv(".env/development.env")
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "supersecretkey")
+app.secret_key = os.getenv("SECRET_KEY")
 
 
 db = None
@@ -26,11 +26,14 @@ db = None
 #                          #
 
 app.config.update(
-    SESSION_COOKIE_SAMESITE=None,
-    REMEMBER_COOKIE_SAMESITE=None,
-    SESSION_COOKIE_SECURE=False,
-    REMEMBER_COOKIE_SECURE=False
+    SECRET_KEY=os.getenv("SECRET_KEY"),
+    SESSION_COOKIE_HTTPONLY=True,
+    REMEMBER_COOKIE_HTTPONLY=True,
+    SESSION_PROTECTION="strong",
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=False
 )
+
 
 
 
@@ -75,42 +78,42 @@ def cerrarConexion():
         finally:
             db = None
 
-@app.route("/mysql/test")
-def test_mysql():
-    conexion = abrirConexion()
-    cursor = conexion.cursor()
-    cursor.execute('SELECT * FROM bocadillos')
-    resultado = cursor.fetchall()
-    cerrarConexion()
-    return jsonify(resultado)
+# @app.route("/mysql/test")
+# def test_mysql():
+#     conexion = abrirConexion()
+#     cursor = conexion.cursor()
+#     cursor.execute('SELECT * FROM bocadillos')
+#     resultado = cursor.fetchall()
+#     cerrarConexion()
+#     return jsonify(resultado)
 
-@app.route('/mysql/buscar/sabores')
-def buscar_sabores():
-    conexion = abrirConexion()
-    cursor = conexion.cursor()
-    cursor.execute("SELECT nombre_sabor FROM sabores")
-    res = cursor.fetchall()
-    cerrarConexion()
+# @app.route('/mysql/buscar/sabores')
+# def buscar_sabores():
+#     conexion = abrirConexion()
+#     cursor = conexion.cursor()
+#     cursor.execute("SELECT nombre_sabor FROM sabores")
+#     res = cursor.fetchall()
+#     cerrarConexion()
 
-    # Verificar la estructura de la respuesta antes de devolverla
-    print("Sabores:", res)
-    return jsonify(res)
+#     # Verificar la estructura de la respuesta antes de devolverla
+#     print("Sabores:", res)
+#     return jsonify(res)
 
-@app.route('/mysql/buscar')
-def buscar_usuario():
-    nombre = request.args.get('nombre', '')
-    conexion = abrirConexion()
-    cursor = conexion.cursor()
-    cursor.execute("SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s", (f"%{nombre}%",))
-    res = cursor.fetchall()
-    cerrarConexion()
+# @app.route('/mysql/buscar')
+# def buscar_usuario():
+#     nombre = request.args.get('nombre', '')
+#     conexion = abrirConexion()
+#     cursor = conexion.cursor()
+#     cursor.execute("SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s", (f"%{nombre}%",))
+#     res = cursor.fetchall()
+#     cerrarConexion()
 
-    # Verificar la estructura de la respuesta antes de devolverla
-    print("Resultado búsqueda:", res)
-    return jsonify(res)
+#     # Verificar la estructura de la respuesta antes de devolverla
+#     print("Resultado búsqueda:", res)
+#     return jsonify(res)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 
 #                                                #
@@ -131,12 +134,13 @@ def roles_required(*allowed_roles):
     return wrapper
 
 
+
 #                           #
 # MANEJO DEL LOGIN - CLASES #
 #                           #
 
 class User(UserMixin):
-    def __init__(self, id, nombre, password_hash, rol='user'):
+    def __init__(self, id, nombre, password_hash, rol='usuario'):
         self.id = str(id)
         self.nombre = nombre
         self.password_hash = password_hash
@@ -150,7 +154,12 @@ class User(UserMixin):
         result = cursor.fetchone()
         cerrarConexion()
         if result:
-            return User(result['id'], result['nombre'], result['password'], result.get('rol', 'user'))
+            return User(
+                result['id'],
+                result['nombre'],
+                result['password'],
+                result.get('access', 'usuario')
+            )
         return None
 
     @staticmethod
@@ -161,8 +170,14 @@ class User(UserMixin):
         result = cursor.fetchone()
         cerrarConexion()
         if result:
-            return User(result['id'], result['nombre'], result['password'], result.get('rol', 'user'))
+            return User(
+                result['id'],
+                result['nombre'],
+                result['password'],
+                result.get('access', 'usuario')  
+            )
         return None
+
 
 
 #                                           #
@@ -176,6 +191,7 @@ def register():
     nombre = data['nombre']
     password = data['password']
     email = data['email']
+    rol = data.get('rol', 'usuario') 
 
     if User.get_by_nombre(nombre):
         return jsonify({'error': 'Usuario ya existe'}), 400
@@ -183,10 +199,14 @@ def register():
     password_hash = generate_password_hash(password)
     conexion = abrirConexion()
     cursor = conexion.cursor()
-    cursor.execute("INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)", (nombre, email, password_hash))
+    cursor.execute(
+        "INSERT INTO usuarios (nombre, email, password, access) VALUES (%s, %s, %s, %s)",
+        (nombre, email, password_hash, rol)
+    )
     conexion.commit()
     cerrarConexion()
     return jsonify({'message': 'Usuario creado'}), 201
+
 
 @app.route('/api/login', methods=['POST'])
 def login():
