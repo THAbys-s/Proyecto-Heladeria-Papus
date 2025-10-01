@@ -1,0 +1,139 @@
+.productos-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.productos-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.2rem;
+}
+
+.producto-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  max-width: 200px;
+  min-width: 150px;
+  margin: 0 auto;
+}
+
+.producto-card:hover {
+  transform: translateY(-5px);
+}
+
+.producto-img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+
+.producto-info {
+  padding: 1rem;
+}
+
+.producto-info h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.producto-precio {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.precio-original {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.precio-descuento {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #cc6310;
+}
+
+.descuento {
+  background-color: #ff6e72;
+  color: white;
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.agregar-carrito {
+  margin-top: 1rem;
+  background-color: #55a4ab;
+  color: white;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.agregar-carrito:hover {
+  background-color: #3c8084;
+}
+
+.carrito-sidebar {
+  width: 300px;
+  background-color: #f7f7f7;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-height: 300px;
+  max-height: 600px;
+  transition: height 0.3s ease;
+  overflow-y: auto;
+}
+
+.carrito-sidebar h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.carrito-sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.carrito-sidebar li {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cantidad {
+  font-weight: bold;
+  color: #cc6310;
+  margin-right: 0.5rem;
+}
+
+.quitar-del-carrito {
+  background: none;
+  border: none;
+  color: #cc6310;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.quitar-del-carrito:hover {
+  color: #ff6e72;
+}

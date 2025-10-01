@@ -39,7 +39,7 @@ const Principal = () => {
           ></path>
         </svg>
         <section className="sabores-section">
-          <h2> Un vistazo a nuestros sabores más tentadores </h2>
+          <h2>¡Elija!</h2>
           <div className="cards-container">
             <Link to="/buscar" className="card">
               Busqueda de Sabores
