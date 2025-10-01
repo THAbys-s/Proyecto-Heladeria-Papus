@@ -1,31 +1,67 @@
 from flask import Flask, url_for, render_template, request, jsonify
 
-import pymysql
+import pymysql, os
 
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from dotenv import load_dotenv
+
+from flask_cors import CORS
+
+from functools import wraps
+
+load_dotenv(".env/development.env")
 
 app = Flask(__name__)
 
+app.secret_key = os.getenv("SECRET_KEY")
+
+
 db = None
 
-#
-# RUTAS DE PRUEBA Y CONEXIÓN DB EN LA NUBE.
-#
+#                          #
+# Clave secreta de la API. #
+#                          #
+
+app.config.update(
+    SECRET_KEY=os.getenv("SECRET_KEY"),
+    SESSION_COOKIE_HTTPONLY=True,
+    REMEMBER_COOKIE_HTTPONLY=True,
+    SESSION_PROTECTION="strong",
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=False
+)
+
+
+
+
+#              #
+# CORS Cookie. #
+#              #
+
+CORS(app,resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+
+
+#                                           #
+# RUTAS DE PRUEBA Y CONEXIÓN DB EN LA NUBE. #
+#                                           #
 
 
 # Abrir la conexión a la base de datos
 def abrirConexion():
     global db
-    if db is None or db.open == 0:  # Verificar si la conexión ya está cerrada
+    if db is None or not db.open:
+        
+        port = int(os.getenv("DB_PORT", 3306))
+
         db = pymysql.connect(
-            host="10.9.120.5",
-            port=3306,
-            user="heladeria",
-            password="papus1234",
-            database="heladeria_papus",
+            host=os.getenv("DB_HOST"),
+            port=port,
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
             cursorclass=pymysql.cursors.DictCursor
         )
     return db
@@ -34,56 +70,81 @@ def abrirConexion():
 def cerrarConexion():
     global db
     if db is not None:
-        db.close()
-        db = None  # Marcar la conexión como cerrada
+        try:
+            if db.open:  # <-- solo cerrar si está abierta
+                db.close()
+        except AttributeError:
+            pass  # db no tiene open (por si algo extraño pasa)
+        finally:
+            db = None
 
-@app.route("/mysql/test")
-def test_mysql():
-    conexion = abrirConexion()
-    cursor = conexion.cursor()
-    cursor.execute('SELECT * FROM bocadillos')
-    resultado = cursor.fetchall()
-    cerrarConexion()
-    return jsonify(resultado)
+# @app.route("/mysql/test")
+# def test_mysql():
+#     conexion = abrirConexion()
+#     cursor = conexion.cursor()
+#     cursor.execute('SELECT * FROM bocadillos')
+#     resultado = cursor.fetchall()
+#     cerrarConexion()
+#     return jsonify(resultado)
 
-@app.route('/mysql/buscar/sabores')
-def buscar_sabores():
-    conexion = abrirConexion()
-    cursor = conexion.cursor()
-    cursor.execute("SELECT nombre_sabor FROM sabores")
-    res = cursor.fetchall()
-    cerrarConexion()
+# @app.route('/mysql/buscar/sabores')
+# def buscar_sabores():
+#     conexion = abrirConexion()
+#     cursor = conexion.cursor()
+#     cursor.execute("SELECT nombre_sabor FROM sabores")
+#     res = cursor.fetchall()
+#     cerrarConexion()
 
-    # Verificar la estructura de la respuesta antes de devolverla
-    print("Sabores:", res)
-    return jsonify(res)
+#     # Verificar la estructura de la respuesta antes de devolverla
+#     print("Sabores:", res)
+#     return jsonify(res)
 
-@app.route('/mysql/buscar')
-def buscar_usuario():
-    nombre = request.args.get('nombre', '')
-    conexion = abrirConexion()
-    cursor = conexion.cursor()
-    cursor.execute("SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s", (f"%{nombre}%",))
-    res = cursor.fetchall()
-    cerrarConexion()
+# @app.route('/mysql/buscar')
+# def buscar_usuario():
+#     nombre = request.args.get('nombre', '')
+#     conexion = abrirConexion()
+#     cursor = conexion.cursor()
+#     cursor.execute("SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s", (f"%{nombre}%",))
+#     res = cursor.fetchall()
+#     cerrarConexion()
 
-    # Verificar la estructura de la respuesta antes de devolverla
-    print("Resultado búsqueda:", res)
-    return jsonify(res)
+#     # Verificar la estructura de la respuesta antes de devolverla
+#     print("Resultado búsqueda:", res)
+#     return jsonify(res)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 
-#
-# MANEJO DEL LOGIN - CLASES
-#
+#                                                #
+# DECORADOR (SEGURIDAD DE RUTAS [LOGIN Y ROLES]) #
+#                                                #
+
+
+def roles_required(*allowed_roles):
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return jsonify({"error": "No autenticado"}), 401
+            if current_user.rol not in allowed_roles:
+                return jsonify({"error": "Acceso denegado"}), 403
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper
+
+
+
+#                           #
+# MANEJO DEL LOGIN - CLASES #
+#                           #
 
 class User(UserMixin):
-    def __init__(self, id, nombre, password_hash):
-        self.id = id
+    def __init__(self, id, nombre, password_hash, rol='usuario'):
+        self.id = str(id)
         self.nombre = nombre
         self.password_hash = password_hash
+        self.rol = rol
 
     @staticmethod
     def get(user_id):
@@ -93,7 +154,12 @@ class User(UserMixin):
         result = cursor.fetchone()
         cerrarConexion()
         if result:
-            return User(result['id'], result['nombre'], result['password'])
+            return User(
+                result['id'],
+                result['nombre'],
+                result['password'],
+                result.get('access', 'usuario')
+            )
         return None
 
     @staticmethod
@@ -104,13 +170,19 @@ class User(UserMixin):
         result = cursor.fetchone()
         cerrarConexion()
         if result:
-            return User(result['id'], result['nombre'], result['password'])
+            return User(
+                result['id'],
+                result['nombre'],
+                result['password'],
+                result.get('access', 'usuario')  
+            )
         return None
 
 
-#
-# RUTAS DE AUTENTICACIÓN, REGISTRO Y LOGIN.
-#
+
+#                                           #
+# RUTAS DE AUTENTICACIÓN, REGISTRO Y LOGIN. #
+#                                           #
 
 
 @app.route('/api/register', methods=['POST'])
@@ -119,6 +191,7 @@ def register():
     nombre = data['nombre']
     password = data['password']
     email = data['email']
+    rol = data.get('rol', 'usuario') 
 
     if User.get_by_nombre(nombre):
         return jsonify({'error': 'Usuario ya existe'}), 400
@@ -126,20 +199,27 @@ def register():
     password_hash = generate_password_hash(password)
     conexion = abrirConexion()
     cursor = conexion.cursor()
-    cursor.execute("INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)", (nombre, email, password_hash))
+    cursor.execute(
+        "INSERT INTO usuarios (nombre, email, password, access) VALUES (%s, %s, %s, %s)",
+        (nombre, email, password_hash, rol)
+    )
     conexion.commit()
     cerrarConexion()
     return jsonify({'message': 'Usuario creado'}), 201
+
 
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
     nombre = data['nombre']
     password = data['password']
-
+    
+    print("Usuario buscado:", nombre)
     user = User.get_by_nombre(nombre)
+    print("Usuario encontrado:", user)
+
     if user and check_password_hash(user.password_hash, password):
-        login_user(user)
+        login_user(user, remember=True)
         return jsonify({'message': 'Logged in'}), 200
     return jsonify({'error': 'Credenciales inválidas'}), 401
 
@@ -151,18 +231,25 @@ def logout():
 
 @app.route('/api/protected')
 @login_required
+@roles_required('admin')
 def protected():
     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
 
-
-#
-# FLASK LOGIN - CONFIGURACIÓN
-#
+#                             #
+# FLASK LOGIN - CONFIGURACIÓN #
+#                             #
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+
+login_manager.login_view = None  
+login_manager.login_message = None  
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
+
+
+
+
