@@ -1,7 +1,7 @@
 import "./principal.css";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../auth/Auth.jsx";
+import { AuthContext } from "../Auth/Auth.jsx";
 
 const Principal = () => {
   const { user, logout } = useContext(AuthContext);
