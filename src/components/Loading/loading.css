@@ -79,6 +79,7 @@ body {
   display: block;
   width: 600px;
   height: 250px;
+  overflow: hidden;
   border-bottom: 3px solid #969696;
   color: #969696;
 }
