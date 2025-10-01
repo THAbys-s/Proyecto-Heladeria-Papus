@@ -6,16 +6,15 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-logo">
-          <a to="/home" rel="noopener noreferrer">
+          <Link to="/home">
             <img
               src="src/components/Navbar/imagenes/logotipo-heladerialospapus-removebg2.png"
-              alt="Principal"
+              alt="Ir a la página principal"
             />
-          </a>
-          <Link to="/home">Los Papus</Link>
+          </Link>
         </div>
+
         <ul className="navbar-menu">
-          <div className="navbar-car-deco"></div>
           <li className="menu-item">
             <Link to="/home" className="card">
               Principal
@@ -31,14 +30,17 @@ const Navbar = () => {
             <Link to="/Productos" className="card">
               Productos
             </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
-                alt="CapelinaFrutilla"
-              />
+
+            {/* Dropdown vertical con varias opciones */}
+            <div className="dropdown-vertical">
+              <Link to="/Productos/helados">Helados</Link>
+              <Link to="/Productos/bombones">Bombones</Link>
+              <Link to="/Productos/cucuruchos">Cucuruchos</Link>
+              <Link to="/Productos/salsas">Salsas</Link>
             </div>
           </li>
-          <li className="menu-item">
+
+          {/* <li className="menu-item">
             <Link to="/sabores" className="card">
               Sabores
             </Link>
@@ -58,7 +60,7 @@ const Navbar = () => {
                 src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
                 alt="CapelinaFrutilla"
               />
-              {/* </div>
+             </div>
           </li>
           <li className="menu-item">
             <Link to="/bocadillos" className="card">
@@ -79,7 +81,7 @@ const Navbar = () => {
               <img
                 src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
                 alt="CapelinaFrutilla"
-              /> */}
+              /> 
             </div>
           </li>
           <li className="menu-item">
@@ -92,7 +94,9 @@ const Navbar = () => {
                 alt="CapelinaFrutilla"
               />
             </div>
-          </li>
+          </li> 
+          */}
+
           <li className="menu-item">
             <Link to="/nosotros" className="card">
               Nosotros

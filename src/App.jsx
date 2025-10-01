@@ -1,15 +1,15 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import PaginaPrincipalPage from "./pages/Principal";
-import BuscarSabores from "./pages/BuscarSabores";
-import NotFound from "./pages/NoFueEncontrado";
+import PaginaPrincipalPage from "./components/Principal/Principal";
+import BuscarSabores from "./components/BuscarSabores";
+import NotFound from "./components/NoFueEncontrado/NoFueEncontrado";
 import Sabores from "./components/Sabores/Sabores";
 import PageWithLoading from "./components/Loading/PageWithLoading";
 import MainLayout from "./components/Layouts/MainLayout";
 import Nosotros from "./components/Nosotros/Nosotros";
-import LoginPage from "./pages/Login";
-import RegisterPage from "./pages/Register";
-import { AuthProvider } from "./components/auth/Auth";
+import LoginPage from "./components/Login/Login";
+import RegisterPage from "./components/Register/Register";
+import { AuthProvider } from "./components/Auth/Auth";
 
 /*
 #FF6E72

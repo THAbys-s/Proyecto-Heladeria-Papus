@@ -1,113 +1,153 @@
+/* ---------------- Navbar ---------------- */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%; /* ocupa todo el ancho */
+  width: 100%;
   height: 60px;
   background-color: #ff6e72;
   border-bottom: 2px solid #dd7e6b;
   color: white;
   z-index: 1000;
   display: flex;
-  justify-content: center; /* centra el contenedor */
+  justify-content: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   font-weight: 600;
 }
 
-/* Contenedor interno con ancho máximo */
 .navbar-container {
   width: 100%;
-  max-width: 1280px; /* límite de ancho */
+  max-width: 1280px;
   display: flex;
-  justify-content: space-between; /* logo izquierda, menú derecha */
+  justify-content: space-between;
   align-items: center;
-  padding: 0 2rem;
-}
-
-.navbar-logo a {
-  color: black;
-  text-decoration: none;
-  font-size: 1.25rem;
-}
-
-.navbar-menu {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center; /* centra todo el menú dentro del navbar */
-  margin: 0;
-  padding: 0;
-}
-
-ul {
-  color: white;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-li a:hover {
-  color: black;
-  font-weight: 450;
-}
-
-/* Contenedor del dropdown */
-.menu-item {
-  position: relative; /* importante para que el dropdown se posicione respecto al link */
-}
-
-.dropdown {
-  position: absolute;
-  top: 55px; /* debajo del navbar */
-  left: 50%; /* empieza en el centro del item */
-  transform: translate(
-    -50%,
-    -10px
-  ); /* centrado horizontal + desplazamiento inicial */
-  background-color: white;
-  border-radius: 8px;
-  padding: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  width: 200px;
-
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.menu-item:hover .dropdown {
-  opacity: 1;
-  transform: translate(-50%, 0); /* centrado + aparece suavemente */
-  pointer-events: auto;
-}
-
-/* Que la imagen ocupe todo el cuadro */
-.dropdown img {
-  width: 100%;
-  display: block;
-}
-
-.navbar-card-deco {
-  background-color: #ffffff;
-  border-radius: 16px;
-  border: 2px solid #ffa9ac;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-  color: #ff6e72;
-  padding: 0.5rem 1rem;
-  display: inline-block; /* para que no ocupe todo el li */
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
-}
-
-.navbar-card-deco:hover {
-  transform: translateY(-4px);
-  border-color: #ff6e72;
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
-  cursor: default; /* no es clickeable */
 }
 
 .navbar-logo img {
   width: 130px;
   height: 45px;
-  /*object-fit: contain; /* para que no se deforme */
+}
+
+/* ---------------- Menu ---------------- */
+.navbar-menu {
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+/* ---------------- Menu-item con cuadro ---------------- */
+.menu-item {
+  position: relative; /* para dropdown */
+}
+
+/* El link ocupa TODO el cuadro */
+.menu-item > a {
+  display: flex; /* flex para centrar contenido */
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* ancho del cuadro */
+  height: 20px; /* alto del cuadro */
+  background-color: #ffffff;
+  border: 2px solid #ffa9ac;
+  border-radius: 12px;
+  color: #ff6e72;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.menu-item > a:hover {
+  background-color: #ffa9ac;
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------------- Dropdown imágenes ---------------- */
+.dropdown {
+  position: absolute;
+  top: 85px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background-color: white;
+  border-radius: 8px;
+  width: 180px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 9999;
+}
+
+.menu-item:hover .dropdown {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown img {
+  width: 100%;
+  display: block;
+}
+
+/* ---------------- Dropdown vertical ---------------- */
+.dropdown-vertical {
+  position: absolute;
+  left: 50%;
+  top: 85px;
+  transform: translateX(-50%) translateY(-10px);
+  background-color: white;
+  border-radius: 8px;
+  width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 9999;
+}
+
+.menu-item:hover .dropdown-vertical {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-vertical a {
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 0;
+  color: #ff6e72;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+  border: 0.1rem solid #ffa9ac;
+}
+
+.dropdown-vertical a:hover {
+  background-color: #ffa9ac;
+  color: black;
+}
+
+/* ---------------- Card navbar extra ---------------- */
+.card-navbar {
+  width: 50px;
+  height: 50px;
+  background-color: #ffffff;
+  border: 2px solid #ff6e72;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.card-navbar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }

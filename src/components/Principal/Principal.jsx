@@ -1,7 +1,7 @@
 import "./principal.css";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../auth/Auth.jsx";
+import { AuthContext } from "../Auth/Auth.jsx";
 
 const Principal = () => {
   const { user, logout } = useContext(AuthContext);
@@ -44,11 +44,6 @@ const Principal = () => {
             <Link to="/buscar" className="card">
               Busqueda de Sabores
             </Link>
-            <div className="card">Capelinas</div>
-            <div className="card">Capelinas</div>
-
-            <div className="card">Capelinas</div>
-            <div className="card">Bombones</div>
             <Link to="/sabores" className="card">
               Sabores
             </Link>
