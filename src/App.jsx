@@ -10,6 +10,7 @@ import Nosotros from "./components/Nosotros/Nosotros";
 import LoginPage from "./components/Login/Login";
 import RegisterPage from "./components/Register/Register";
 import { AuthProvider } from "./components/Auth/Auth";
+import Productos from "./components/Productos/Productos";
 
 /*
 #FF6E72
@@ -37,6 +38,16 @@ function App() {
               </PageWithLoading>
             }
           />
+          <Route
+            path="/productos"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <Productos />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          ></Route>
           {/* Ruta de Busqueda */}
           <Route
             path="/buscar"

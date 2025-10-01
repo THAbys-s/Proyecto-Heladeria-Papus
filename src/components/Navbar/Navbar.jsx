@@ -30,72 +30,7 @@ const Navbar = () => {
             <Link to="/Productos" className="card">
               Productos
             </Link>
-
-            {/* Dropdown vertical con varias opciones */}
-            <div className="dropdown-vertical">
-              <Link to="/Productos/helados">Helados</Link>
-              <Link to="/Productos/bombones">Bombones</Link>
-              <Link to="/Productos/cucuruchos">Cucuruchos</Link>
-              <Link to="/Productos/salsas">Salsas</Link>
-            </div>
           </li>
-
-          {/* <li className="menu-item">
-            <Link to="/sabores" className="card">
-              Sabores
-            </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
-                alt="CapelinaFrutilla"
-              />
-            </div>
-          </li>
-          <li className="menu-item">
-            <Link to="/sabores extravagantes" className="card">
-              Especiales
-            </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
-                alt="CapelinaFrutilla"
-              />
-             </div>
-          </li>
-          <li className="menu-item">
-            <Link to="/bocadillos" className="card">
-              Bocadillos
-            </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
-                alt="CapelinaFrutilla"
-              />
-            </div>
-          </li>
-          <li className="menu-item">
-            <Link to="/salsas" className="card">
-              Salsas
-            </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
-                alt="CapelinaFrutilla"
-              /> 
-            </div>
-          </li>
-          <li className="menu-item">
-            <Link to="/cucuruchos" className="card">
-              Cucuruchos
-            </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/capelinas-frutilla.jpg"
-                alt="CapelinaFrutilla"
-              />
-            </div>
-          </li> 
-          */}
 
           <li className="menu-item">
             <Link to="/nosotros" className="card">
@@ -107,6 +42,12 @@ const Navbar = () => {
                 alt="HeladeriaLosPapus"
               />
             </div>
+          </li>
+
+          <li>
+            <Link to="/register" className="card">
+              Registrarse
+            </Link>
           </li>
         </ul>
       </div>
