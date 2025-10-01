@@ -7,8 +7,8 @@
 
 .productos-lista {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 20fr));
+  gap: 1.9rem;
 }
 
 .producto-card {
@@ -18,9 +18,11 @@
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
-  max-width: 200px;
-  min-width: 150px;
   margin: 0 auto;
+  max-width: 220px;
+  min-width: 180px;
+  word-wrap: break-word;
+  box-sizing: border-box;
 }
 
 .producto-card:hover {
@@ -41,6 +43,8 @@
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .producto-precio {
