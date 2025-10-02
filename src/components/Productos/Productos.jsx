@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import "./productos.css";
 
 const Productos = () => {
@@ -142,6 +142,25 @@ const Productos = () => {
   ];
 
   const [carrito, setCarrito] = useState([]);
+  const [mostrarMenu, setMostrarMenu] = useState(false);
+  const [esFijo, setEsFijo] = useState(false);
+  const carritoRef = useRef(null);
+
+  useEffect(() => {
+    const manejarScroll = () => {
+      if (!carritoRef.current) return;
+      const { top } = carritoRef.current.getBoundingClientRect();
+      setEsFijo(top <= 10);
+    };
+    window.addEventListener("scroll", manejarScroll);
+    manejarScroll();
+    return () => window.removeEventListener("scroll", manejarScroll);
+  }, []);
+
+  const carritoClassName = useMemo(
+    () => `carrito-sidebar${esFijo ? " fijo" : ""}`,
+    [esFijo]
+  );
 
   // Función para agregar al carrito
   const agregarAlCarrito = (producto) => {
@@ -171,6 +190,45 @@ const Productos = () => {
         .filter((item) => item.cantidad > 0)
     );
   };
+
+  // Memoriza la lista de productos en el carrito
+  const carritoItems = useMemo(
+    () => (
+      <ul>
+        {carrito.map((item) => (
+          <li key={item.id}>
+            <span className="carrito-item">
+              <span className="cantidad">{item.cantidad}x</span> {item.nombre}-
+              ${item.precio.toLocaleString()}
+            </span>
+            <button
+              className="quitar-del-carrito"
+              onClick={() => quitarDelCarrito(item.id)}
+              title="Quitar uno"
+            >
+              Quitar
+            </button>
+          </li>
+        ))}
+      </ul>
+    ),
+    [carrito]
+  );
+
+  // Memoriza el botón "Finalizar Compra" que aparece solo si hay productos
+  const finalizarCompraBtn = useMemo(
+    () =>
+      carrito.length > 0 && (
+        <button
+          className="finalizar-compra-btn"
+          onClick={() => setMostrarMenu(true)}
+          style={{ marginTop: "20px", width: "100%" }}
+        >
+          Finalizar Compra
+        </button>
+      ),
+    [carrito.length]
+  );
 
   return (
     <div className="productos-container">
@@ -217,25 +275,23 @@ const Productos = () => {
         {carrito.length === 0 ? (
           <p>Tu pedido está vacío</p>
         ) : (
-          <ul>
-            {carrito.map((item) => (
-              <li key={item.id}>
-                <span className="carrito-item">
-                  <span className="cantidad">{item.cantidad}x</span>{" "}
-                  {item.nombre}- ${item.precio.toLocaleString()}
-                </span>
-                <button
-                  className="quitar-del-carrito"
-                  onClick={() => quitarDelCarrito(item.id)}
-                  title="Quitar uno"
-                >
-                  Quitar
-                </button>
-              </li>
-            ))}
-          </ul>
+          <>
+            {carritoItems}
+            {finalizarCompraBtn}
+          </>
         )}
       </div>
+
+      {/* Menú modal centrado */}
+      {mostrarMenu && (
+        <div className="modal-overlay">
+          <div className="modal-contenido">
+            <h2>Finalizar Compra</h2>
+            <p>Aquí puedes continuar con el proceso de pago...</p>
+            <button onClick={() => setMostrarMenu(false)}>Cerrar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
