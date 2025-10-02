@@ -98,7 +98,8 @@
 }
 
 .carrito-sidebar {
-  position: fixed;
+  /* position: fixed; */
+  /* al 70% de vista, la página se ve hermosa */
   top: 100px;
   right: 2rem;
   width: 300px;

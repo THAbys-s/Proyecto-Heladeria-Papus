@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import "./productos.css";
 
 const Productos = () => {
@@ -143,24 +143,6 @@ const Productos = () => {
 
   const [carrito, setCarrito] = useState([]);
   const [mostrarMenu, setMostrarMenu] = useState(false);
-  const [esFijo, setEsFijo] = useState(false);
-  const carritoRef = useRef(null);
-
-  useEffect(() => {
-    const manejarScroll = () => {
-      if (!carritoRef.current) return;
-      const { top } = carritoRef.current.getBoundingClientRect();
-      setEsFijo(top <= 10);
-    };
-    window.addEventListener("scroll", manejarScroll);
-    manejarScroll();
-    return () => window.removeEventListener("scroll", manejarScroll);
-  }, []);
-
-  const carritoClassName = useMemo(
-    () => `carrito-sidebar${esFijo ? " fijo" : ""}`,
-    [esFijo]
-  );
 
   // Función para agregar al carrito
   const agregarAlCarrito = (producto) => {
