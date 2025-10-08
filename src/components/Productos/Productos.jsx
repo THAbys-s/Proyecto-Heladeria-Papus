@@ -1,190 +1,99 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import "./productos.css";
 
-const Productos = () => {
-  const productos = [
-    {
-      id: 1,
-      nombre: "Crujido Tentador",
-      precio: 2200,
-      precioOriginal: 2500,
-      descuento: 12,
-      img: "src/components/Productos/imagenes/bombon-crocante.jpg",
-    },
-    {
-      id: 2,
-      nombre: "Boscado Celestial",
-      precio: 2300,
-      precioOriginal: 2600,
-      descuento: 12,
-      img: "src/components/Productos/imagenes/bombon-escoces.jpg",
-    },
-    {
-      id: 3,
-      nombre: "Dulce Suspiro",
-      precio: 2300,
-      precioOriginal: 2600,
-      descuento: 12,
-      img: "src/components/Productos/imagenes/bombon-split.jpg",
-    },
-    {
-      id: 4,
-      nombre: "Duo Delicia",
-      precio: 2300,
-      precioOriginal: 2600,
-      descuento: 12,
-      img: "src/components/Productos/imagenes/bombon-suizo.jpg",
-    },
-    {
-      id: 5,
-      nombre: "Vainilla Sueño",
-      precio: 2100,
-      precioOriginal: 2400,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/capelinas-chocolate.jpg",
-    },
-    {
-      id: 6,
-      nombre: "Frescura Tropical",
-      precio: 2100,
-      precioOriginal: 2400,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/capelinas-frutal.jpg",
-    },
-    {
-      id: 7,
-      nombre: "Frutilla Encantada",
-      precio: 2100,
-      precioOriginal: 2400,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/capelinas-frutilla.jpg",
-    },
-    {
-      id: 8,
-      nombre: "Chocolate Divino",
-      precio: 2100,
-      precioOriginal: 2400,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/capelinas-nuez.jpg",
-    },
-    {
-      id: 9,
-      nombre: "Palito Bombón",
-      precio: 1800,
-      precioOriginal: 2000,
-      descuento: 10,
-      img: "src/components/Productos/imagenes/palito-bombon.jpg",
-    },
-    {
-      id: 10,
-      nombre: "Palito Vainillita",
-      precio: 1800,
-      precioOriginal: 2000,
-      descuento: 10,
-      img: "src/components/Productos/imagenes/palitocremoso-americana.jpg",
-    },
-    {
-      id: 11,
-      nombre: "Palito Rosado",
-      precio: 1800,
-      precioOriginal: 2000,
-      descuento: 10,
-      img: "src/components/Productos/imagenes/palitocremoso-frutilla.jpg",
-    },
-    {
-      id: 12,
-      nombre: "Crujido Almendrado",
-      precio: 3500,
-      precioOriginal: 4000,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/postres-almendrado.jpg",
-    },
-    {
-      id: 13,
-      nombre: "Trio Tentador",
-      precio: 3500,
-      precioOriginal: 4000,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/postres-cassata.jpg",
-    },
-    {
-      id: 14,
-      nombre: "Sueño Chocolatoso",
-      precio: 3500,
-      precioOriginal: 4000,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/postres-crocantino.jpg",
-    },
-    {
-      id: 15,
-      nombre: "Beso De Amor",
-      precio: 3500,
-      precioOriginal: 4000,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/postres-delicia.jpg",
-    },
-    {
-      id: 16,
-      nombre: "Sundae Frutal",
-      precio: 2000,
-      precioOriginal: 2300,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/sundae-frutal.jpg",
-    },
-    {
-      id: 17,
-      nombre: "Sundae Go",
-      precio: 2000,
-      precioOriginal: 2300,
-      descuento: 13,
-      img: "src/components/Productos/imagenes/sundae-go.jpg",
-    },
-  ];
+const imgUrls = {
+  "Crujido Tentador":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-crocante_pjggzf.jpg",
+  "Boscado Celestial":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-escoces_etximj.jpg",
+  "Dulce Suspiro":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-split_jzocao.jpg",
+  "Duo Delicia":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-suizo_uajm0g.jpg",
+  "Vainilla Sueño":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/capelinas-chocolate_dvqf1s.jpg",
+  "Frescura Tropical":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/capelinas-frutal_ecktij.jpg",
+  "Frutilla Encantada":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933012/capelinas-frutilla_e4xxhj.jpg",
+  "Chocolate Divino":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/capelinas-nuez_nkkhlx.jpg",
+  "Palito Bombón":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palito-bombon_x3wdc7.jpg",
+  "Palito Vainillita":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palitocremoso-americana_ncrz23.jpg",
+  "Palito Rosado":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palitocremoso-frutilla_bkwwo7.jpg",
+  "Crujido Almendrado":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-almendrado_nmfxwe.jpg",
+  "Trio Tentador":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-cassata_n4nmcp.jpg",
+  "Sueño Chocolatoso":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-crocantino_ewicb2.jpg",
+  "Beso De Amor":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-delicia_lsyjoo.jpg",
+  "Sundae Frutal":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/sundae-frutal_fgxdi3.jpg",
+  "Sundae Go":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933035/sundae-go_zhnr5w.jpg",
+};
 
+const Productos = () => {
+  const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
   const [mostrarMenu, setMostrarMenu] = useState(false);
 
-  // Función para agregar al carrito
+  useEffect(() => {
+    fetch("/api/productos")
+      .then((res) => res.json())
+      .then((data) => {
+        // Asignar la URL correcta de imagen a cada producto según nombre
+        const productosConImg = data.map((p) => ({
+          ...p,
+          img: imgUrls[p.nombre] || "",
+        }));
+        setProductos(productosConImg);
+      })
+      .catch((error) => console.error("Error cargando productos:", error));
+  }, []);
+
+  useEffect(() => {
+    const h = Math.max(300, 80 + carrito.length * 60);
+    document.documentElement.style.setProperty("--cart-height", `${h}px`);
+  }, [carrito.length]);
+
   const agregarAlCarrito = (producto) => {
-    setCarrito((prevCarrito) => {
-      const existe = prevCarrito.find((item) => item.id === producto.id);
-      if (existe) {
-        return prevCarrito.map((item) =>
-          item.id === producto.id
-            ? { ...item, cantidad: item.cantidad + 1 }
-            : item
-        );
-      } else {
-        return [...prevCarrito, { ...producto, cantidad: 1 }];
-      }
+    setCarrito((prev) => {
+      const existe = prev.find((i) => i.id === producto.id);
+      return existe
+        ? prev.map((i) =>
+            i.id === producto.id ? { ...i, cantidad: i.cantidad + 1 } : i
+          )
+        : [...prev, { ...producto, cantidad: 1 }];
     });
   };
 
-  // Función para quitar del carrito (elimina el producto si queda en 1)
   const quitarDelCarrito = (productoId) => {
-    setCarrito((prevCarrito) =>
-      prevCarrito
-        .map((item) =>
-          item.id === productoId
-            ? { ...item, cantidad: item.cantidad - 1 }
-            : item
+    setCarrito((prev) =>
+      prev
+        .map((i) =>
+          i.id === productoId ? { ...i, cantidad: i.cantidad - 1 } : i
         )
-        .filter((item) => item.cantidad > 0)
+        .filter((i) => i.cantidad > 0)
     );
   };
 
-  // Memoriza la lista de productos en el carrito
   const carritoItems = useMemo(
     () => (
-      <ul>
+      <ul className="list-unstyled">
         {carrito.map((item) => (
-          <li key={item.id}>
+          <li key={item.id} className="cart-row">
             <span className="carrito-item">
-              <span className="cantidad">{item.cantidad}x</span> {item.nombre}-
+              <span className="cantidad">{item.cantidad}x</span> {item.nombre} -
               ${item.precio.toLocaleString()}
             </span>
             <button
-              className="quitar-del-carrito"
+              className="btn-link quitar-del-carrito"
               onClick={() => quitarDelCarrito(item.id)}
               title="Quitar uno"
             >
@@ -197,14 +106,12 @@ const Productos = () => {
     [carrito]
   );
 
-  // Memoriza el botón "Finalizar Compra" que aparece solo si hay productos
   const finalizarCompraBtn = useMemo(
     () =>
       carrito.length > 0 && (
         <button
-          className="finalizar-compra-btn"
+          className="btn btn-submit finalizar-compra-btn"
           onClick={() => setMostrarMenu(true)}
-          style={{ marginTop: "20px", width: "100%" }}
         >
           Finalizar Compra
         </button>
@@ -213,68 +120,71 @@ const Productos = () => {
   );
 
   return (
-    <div className="productos-container">
-      <div className="productos-lista">
-        {productos.map((producto) => (
-          <div key={producto.id} className="producto-card">
-            <img
-              src={producto.img}
-              alt={producto.nombre}
-              className="producto-img"
-            />
-            <div className="producto-info">
-              <h3>{producto.nombre}</h3>
-              <div className="producto-precio">
-                <span className="precio-original">
-                  ${producto.precioOriginal.toLocaleString()}
-                </span>
-                <span className="precio-descuento">
-                  ${producto.precio.toLocaleString()}
-                </span>
-                <span className="descuento">-{producto.descuento}%</span>
+    <main className="container productos">
+      <section className="productos-container">
+        <div className="productos-lista in-view">
+          {productos.map((producto) => (
+            <article key={producto.id} className="producto-card info-card">
+              <img
+                src={producto.img}
+                alt={producto.nombre}
+                className="producto-img"
+              />
+              <div className="producto-info">
+                <h3>{producto.nombre}</h3>
+                <div className="producto-precio">
+                  <span className="precio-original">
+                    ${producto.precioOriginal.toLocaleString()}
+                  </span>
+                  <span className="precio-descuento">
+                    ${producto.precio.toLocaleString()}
+                  </span>
+                  <span className="descuento">-{producto.descuento}%</span>
+                </div>
+                <button
+                  className="btn btn-primary agregar-carrito"
+                  onClick={() => agregarAlCarrito(producto)}
+                >
+                  Agregar al carrito
+                </button>
               </div>
-              <button
-                className="agregar-carrito"
-                onClick={() => agregarAlCarrito(producto)}
-              >
-                Agregar al carrito
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+            </article>
+          ))}
+        </div>
 
-      <div
-        className="carrito-sidebar"
-        style={{
-          height: `${Math.max(300, 80 + carrito.length * 60)}px`,
-          minHeight: "300px",
-          maxHeight: "600px",
-          transition: "height 0.3s ease",
-        }}
-      >
-        <h3>Mi pedido</h3>
-        {carrito.length === 0 ? (
-          <p>Tu pedido está vacío</p>
-        ) : (
-          <>
-            {carritoItems}
-            {finalizarCompraBtn}
-          </>
-        )}
-      </div>
+        <aside className="carrito-sidebar h-dynamic" aria-label="Mi pedido">
+          <h3>Mi pedido</h3>
+          {carrito.length === 0 ? (
+            <p className="muted">Tu pedido está vacío</p>
+          ) : (
+            <>
+              {carritoItems}
+              {finalizarCompraBtn}
+            </>
+          )}
+        </aside>
+      </section>
 
-      {/* Menú modal centrado */}
       {mostrarMenu && (
-        <div className="modal-overlay">
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
           <div className="modal-contenido">
-            <h2>Finalizar Compra</h2>
+            <h2 id="modal-title">Finalizar Compra</h2>
             <p>Aquí puedes continuar con el proceso de pago...</p>
-            <button onClick={() => setMostrarMenu(false)}>Cerrar</button>
+            <button
+              className="btn btn-submit"
+              onClick={() => setMostrarMenu(false)}
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

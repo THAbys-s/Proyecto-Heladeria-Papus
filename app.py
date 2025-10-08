@@ -179,6 +179,30 @@ class User(UserMixin):
         return None
 
 
+#                     #
+# URL DE LAS IMAGENES #
+#                     #
+
+img_urls = {
+    "Crujido Tentador": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-crocante_pjggzf.jpg",
+    "Boscado Celestial": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-escoces_etximj.jpg",
+    "Dulce Suspiro": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-split_jzocao.jpg",
+    "Duo Delicia": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-suizo_uajm0g.jpg",
+    "Vainilla Sueño": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/capelinas-chocolate_dvqf1s.jpg",
+    "Frescura Tropical": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/capelinas-frutal_ecktij.jpg",
+    "Frutilla Encantada": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933012/capelinas-frutilla_e4xxhj.jpg",
+    "Chocolate Divino": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/capelinas-nuez_nkkhlx.jpg",
+    "Palito Bombón": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palito-bombon_x3wdc7.jpg",
+    "Palito Vainillita": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palitocremoso-americana_ncrz23.jpg",
+    "Palito Rosado": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palitocremoso-frutilla_bkwwo7.jpg",
+    "Crujido Almendrado": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-almendrado_nmfxwe.jpg",
+    "Trio Tentador": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-cassata_n4nmcp.jpg",
+    "Sueño Chocolatoso": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-crocantino_ewicb2.jpg",
+    "Beso De Amor": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-delicia_lsyjoo.jpg",
+    "Sundae Frutal": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/sundae-frutal_fgxdi3.jpg",
+    "Sundae Go": "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933035/sundae-go_zhnr5w.jpg"
+}
+
 
 #                                           #
 # RUTAS DE AUTENTICACIÓN, REGISTRO Y LOGIN. #
@@ -235,6 +259,20 @@ def logout():
 def protected():
     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
 
+@app.route('/api/productos', methods=['GET'])
+def api_productos():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id, nombre, precio, precioOriginal, descuento FROM productos")
+    productos = cursor.fetchall()
+    cerrarConexion()
+
+    for producto in productos:
+        producto['img'] = img_urls.get(producto['nombre'], '')
+
+    return jsonify(productos)
+
+
 #                             #
 # FLASK LOGIN - CONFIGURACIÓN #
 #                             #
@@ -248,6 +286,7 @@ login_manager.login_message = None
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
 
 
 

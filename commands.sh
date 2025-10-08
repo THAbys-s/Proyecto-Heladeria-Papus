@@ -12,3 +12,4 @@ pip install flask-cors
 
 pip install cryptography
 
+npm install react-icons

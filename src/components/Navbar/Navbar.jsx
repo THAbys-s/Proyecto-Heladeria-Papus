@@ -1,10 +1,18 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { FiMenu } from "react-icons/fi";
 import "./navbar.css";
 
 const Navbar = () => {
+  const [menuAbierto, setMenuAbierto] = useState(false);
+
+  // Alterna visibilidad del menú en móvil
+  const toggleMenu = () => setMenuAbierto((prev) => !prev);
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
+        {/* Logo */}
         <div className="navbar-logo">
           <Link to="/home">
             <img
@@ -14,9 +22,24 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <ul className="navbar-menu">
+        {/* Icono menú hamburguesa para móviles */}
+        <button
+          className="menu-burger"
+          aria-label="Abrir menú"
+          aria-expanded={menuAbierto}
+          onClick={toggleMenu}
+        >
+          <FiMenu size={28} color="#fff" />
+        </button>
+
+        {/* Menú principal */}
+        <ul className={`navbar-menu ${menuAbierto ? "show-menu" : ""}`}>
           <li className="menu-item">
-            <Link to="/home" className="card">
+            <Link
+              to="/home"
+              className="card"
+              onClick={() => setMenuAbierto(false)}
+            >
               Principal
             </Link>
             <div className="dropdown">
@@ -27,13 +50,20 @@ const Navbar = () => {
             </div>
           </li>
           <li className="menu-item">
-            <Link to="/Productos" className="card">
+            <Link
+              to="/Productos"
+              className="card"
+              onClick={() => setMenuAbierto(false)}
+            >
               Productos
             </Link>
           </li>
-
           <li className="menu-item">
-            <Link to="/nosotros" className="card">
+            <Link
+              to="/nosotros"
+              className="card"
+              onClick={() => setMenuAbierto(false)}
+            >
               Nosotros
             </Link>
             <div className="dropdown">
@@ -43,9 +73,12 @@ const Navbar = () => {
               />
             </div>
           </li>
-
-          <li>
-            <Link to="/register" className="card">
+          <li className="menu-item">
+            <Link
+              to="/register"
+              className="card"
+              onClick={() => setMenuAbierto(false)}
+            >
               Registrarse
             </Link>
           </li>

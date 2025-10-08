@@ -33,20 +33,21 @@
   list-style: none;
   display: flex;
   align-items: center;
+  z-index: 1;
 }
 
 /* ---------------- Menu-item con cuadro ---------------- */
 .menu-item {
-  position: relative; /* para dropdown */
+  position: relative;
 }
 
 /* El link ocupa TODO el cuadro */
 .menu-item > a {
-  display: flex; /* flex para centrar contenido */
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px; /* ancho del cuadro */
-  height: 20px; /* alto del cuadro */
+  width: 40px;
+  height: 20px;
   background-color: #ffffff;
   border: 2px solid #ffa9ac;
   border-radius: 12px;
@@ -150,4 +151,86 @@
 .card-navbar:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.menu-burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .menu-burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffa9ac;
+    border: 2px solid black;
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .menu-burger svg {
+    width: 24px;
+    height: 24px;
+    stroke: black; /* para las líneas del icono */
+  }
+
+  .navbar-menu {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: 200px;
+    background-color: #ff6e72;
+    max-height: calc(100vh - 60px);
+    height: auto;
+    overflow-y: auto;
+    flex-direction: column;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transition: transform 0.3s ease;
+    transform: translateX(100%);
+  }
+
+  .navbar-menu .card {
+    font-size: 1rem;
+    padding: 8px 12px;
+    width: auto;
+  }
+
+  .navbar-menu.show-menu {
+    display: flex;
+    transform: translateX(0);
+  }
+
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
+  .navbar-menu li {
+    margin: 1rem 0;
+    text-align: center;
+  }
+
+  .menu-item > a {
+    width: auto;
+    padding: 8px 12px;
+  }
+
+  .dropdown,
+  .dropdown-vertical {
+    display: none !important;
+  }
+
+  .navbar-menu li:last-child > a {
+    width: auto;
+    padding: 8px 12px;
+  }
 }
