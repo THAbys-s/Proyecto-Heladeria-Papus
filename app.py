@@ -71,10 +71,10 @@ def cerrarConexion():
     global db
     if db is not None:
         try:
-            if db.open:  # <-- solo cerrar si está abierta
+            if hasattr(db, "open") and db.open:
                 db.close()
-        except AttributeError:
-            pass  # db no tiene open (por si algo extraño pasa)
+        except Exception:
+            pass
         finally:
             db = None
 
