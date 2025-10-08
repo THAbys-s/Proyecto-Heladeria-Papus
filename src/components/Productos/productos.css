@@ -24,7 +24,7 @@
   border: none;
   border-radius: var(--radius);
   padding: 12px 18px;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   display: inline-block;
   text-align: center;
@@ -107,7 +107,7 @@
   min-width: 180px;
   display: flex;
   flex-direction: column;
-  height: 360px;
+  height: 320px;
 }
 
 .producto-card:hover {
