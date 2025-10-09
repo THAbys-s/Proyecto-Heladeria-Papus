@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./productos.css";
 
 const imgUrls = {
@@ -42,6 +43,7 @@ const Productos = () => {
   const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
   const [mostrarMenu, setMostrarMenu] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("/api/productos")
@@ -121,6 +123,15 @@ const Productos = () => {
 
   return (
     <main className="container productos">
+      {/* Botón Personaliza tu Helado, arriba de la grilla */}
+      <div className="boton-producto" style={{ marginBottom: "1.5rem" }}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/crea-tu-helado")}
+        >
+          Personaliza tu helado
+        </button>
+      </div>
       <section className="productos-container">
         <div className="productos-lista in-view">
           {productos.map((producto) => (

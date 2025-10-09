@@ -19,7 +19,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
 
-db = None
 
 #                          #
 # Clave secreta de la API. #
@@ -41,7 +40,7 @@ app.config.update(
 # CORS Cookie. #
 #              #
 
-CORS(app,resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+CORS(app,resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}}, supports_credentials=True)
 
 
 #                                           #
@@ -51,32 +50,41 @@ CORS(app,resources={r"/*": {"origins": "http://localhost:5173"}}, supports_crede
 
 # Abrir la conexión a la base de datos
 def abrirConexion():
-    global db
-    if db is None or not db.open:
-        
-        port = int(os.getenv("DB_PORT", 3306))
+    """Create and return a new DB connection for each caller.
 
-        db = pymysql.connect(
-            host=os.getenv("DB_HOST"),
-            port=port,
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-            cursorclass=pymysql.cursors.DictCursor
-        )
-    return db
+    Avoid sharing a global connection across requests because Flask may
+    serve requests concurrently which can lead to one request closing
+    the socket while another is reading from it (ValueError: read of closed file).
+    """
+    port = int(os.getenv("DB_PORT", 3306))
+    conexion = pymysql.connect(
+        host=os.getenv("DB_HOST"),
+        port=port,
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        cursorclass=pymysql.cursors.DictCursor,
+    )
+    return conexion
 
 # Cerrar la conexión
-def cerrarConexion():
-    global db
-    if db is not None:
-        try:
-            if hasattr(db, "open") and db.open:
-                db.close()
-        except Exception:
-            pass
-        finally:
-            db = None
+def cerrarConexion(conexion):
+    """Close the provided DB connection if it's open.
+
+    This function accepts the connection returned by `abrirConexion()` and
+    closes it. It intentionally does not manage a global connection.
+    """
+    try:
+        if conexion:
+            # Some pymysql versions expose an `open` attribute; double-check
+            if hasattr(conexion, "open"):
+                if conexion.open:
+                    conexion.close()
+            else:
+                conexion.close()
+    except Exception:
+        # Don't let closing errors crash the endpoint
+        pass
 
 # @app.route("/mysql/test")
 # def test_mysql():
@@ -116,9 +124,70 @@ def cerrarConexion():
 #     app.run(debug=True)
 
 
+
+#                            #
+# RUTAS ESPECIALES DE LA API #
+#                            #
+
+@app.route('/api/sabores', methods=['GET'])
+def obtener_sabores():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT nombre_sabor FROM sabores")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    nombres = [row['nombre_sabor'] for row in res]
+    return jsonify(nombres)
+
+# Bocadillos
+@app.route('/api/bocadillos', methods=['GET'])
+def obtener_bocadillos():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT nombre_bocadillo FROM bocadillos")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    nombres = [row['nombre_bocadillo'] for row in res]
+    return jsonify(nombres)
+
+# Cucuruchos
+@app.route('/api/cucuruchos', methods=['GET'])
+def obtener_cucuruchos():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT nombre_cucurucho FROM cucuruchos")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    nombres = [row['nombre_cucurucho'] for row in res]
+    return jsonify(nombres)
+
+# Salsas
+@app.route('/api/salsas', methods=['GET'])
+def obtener_salsas():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT nombre_salsa FROM salsas")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    nombres = [row['nombre_salsa'] for row in res]
+    return jsonify(nombres)
+
+# Sabores Especiales
+@app.route('/api/especiales', methods=['GET'])
+def obtener_especiales():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT nombre_especial FROM especiales")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    nombres = [row['nombre_especial'] for row in res]
+    return jsonify(nombres)
+
+
+
 #                                                #
 # DECORADOR (SEGURIDAD DE RUTAS [LOGIN Y ROLES]) #
-#                                                #
+#                                                # 
 
 
 def roles_required(*allowed_roles):
@@ -152,7 +221,7 @@ class User(UserMixin):
         cursor = conexion.cursor()
         cursor.execute("SELECT * FROM usuarios WHERE id = %s", (user_id,))
         result = cursor.fetchone()
-        cerrarConexion()
+        cerrarConexion(conexion)
         if result:
             return User(
                 result['id'],
@@ -168,7 +237,7 @@ class User(UserMixin):
         cursor = conexion.cursor()
         cursor.execute("SELECT * FROM usuarios WHERE nombre = %s", (nombre,))
         result = cursor.fetchone()
-        cerrarConexion()
+        cerrarConexion(conexion)
         if result:
             return User(
                 result['id'],
@@ -228,7 +297,7 @@ def register():
         (nombre, email, password_hash, rol)
     )
     conexion.commit()
-    cerrarConexion()
+    cerrarConexion(conexion)
     return jsonify({'message': 'Usuario creado'}), 201
 
 
@@ -265,7 +334,7 @@ def api_productos():
     cursor = conexion.cursor()
     cursor.execute("SELECT id, nombre, precio, precioOriginal, descuento FROM productos")
     productos = cursor.fetchall()
-    cerrarConexion()
+    cerrarConexion(conexion)
 
     for producto in productos:
         producto['img'] = img_urls.get(producto['nombre'], '')

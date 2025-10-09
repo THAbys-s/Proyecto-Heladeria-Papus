@@ -11,6 +11,7 @@ import LoginPage from "./components/Login/Login";
 import RegisterPage from "./components/Register/Register";
 import { AuthProvider } from "./components/Auth/Auth";
 import Productos from "./components/Productos/Productos";
+import HazTuHelado from "./components/HazTuHelado/HazTuHelado";
 
 /*
 #FF6E72
@@ -81,6 +82,17 @@ function App() {
               </PageWithLoading>
             }
           />
+          {/* Crea tu helado */}
+          <Route
+            path="crea-tu-helado"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <HazTuHelado />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          ></Route>
 
           {/* Página 404 */}
           <Route path="*" element={<NotFound />} />

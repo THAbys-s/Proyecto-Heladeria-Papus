@@ -13,7 +13,7 @@ export default defineConfig({
         secure: false,
       },
     },
-    host: "127.0.0.1", // fuerza Vite a servir desde 127.0.0.1
+    host: "localhost", // fuerza Vite a servir desde 127.0.0.1
     port: 5173,
   },
 });
