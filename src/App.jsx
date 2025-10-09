@@ -1,16 +1,17 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import PaginaPrincipalPage from "./pages/Principal";
-import BuscarSabores from "./pages/BuscarSabores";
-import NotFound from "./pages/NoFueEncontrado";
+import PaginaPrincipalPage from "./components/Principal/Principal";
+import BuscarSabores from "./components/BuscarSabores";
+import NotFound from "./components/NoFueEncontrado/NoFueEncontrado";
 import Sabores from "./components/Sabores/Sabores";
 import PageWithLoading from "./components/Loading/PageWithLoading";
 import MainLayout from "./components/Layouts/MainLayout";
 import Nosotros from "./components/Nosotros/Nosotros";
-import Sabores from "./components/sabores/Sabores";
-import LoginPage from "./pages/Login";
-import RegisterPage from "./pages/Register";
-import { AuthProvider } from "./components/auth/Auth";
+import LoginPage from "./components/Login/Login";
+import RegisterPage from "./components/Register/Register";
+import { AuthProvider } from "./components/Auth/Auth";
+import Productos from "./components/Productos/Productos";
+import HazTuHelado from "./components/HazTuHelado/HazTuHelado";
 
 /*
 #FF6E72
@@ -38,6 +39,16 @@ function App() {
               </PageWithLoading>
             }
           />
+          <Route
+            path="/productos"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <Productos />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          ></Route>
           {/* Ruta de Busqueda */}
           <Route
             path="/buscar"
@@ -71,6 +82,17 @@ function App() {
               </PageWithLoading>
             }
           />
+          {/* Crea tu helado */}
+          <Route
+            path="crea-tu-helado"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <HazTuHelado />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          ></Route>
 
           {/* Página 404 */}
           <Route path="*" element={<NotFound />} />

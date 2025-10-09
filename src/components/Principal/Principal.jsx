@@ -1,7 +1,11 @@
 import "./principal.css";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../Auth/Auth.jsx";
 
 const Principal = () => {
+  const { user, logout } = useContext(AuthContext);
+
   return (
     <div className="principal-container">
       <header className="principal-header">
@@ -13,7 +17,17 @@ const Principal = () => {
           ></path>
         </svg>
         <h1> Heladería Los Papus</h1>
-        <h2>¡Bienvenido a la mejor heladería de la ciudad!</h2>
+
+        {user ? (
+          <>
+            <h2>¡Hola {user.nombre}, bienvenido nuevamente!</h2>
+            <button onClick={logout} className="logout-btn">
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <h2>¡Bienvenido a la mejor heladería de la ciudad!</h2>
+        )}
       </header>
 
       <main className="principal-main">
@@ -25,16 +39,11 @@ const Principal = () => {
           ></path>
         </svg>
         <section className="sabores-section">
-          <h2> Un vistazo a nuestros sabores más tentadores </h2>
+          <h2>¡Elija!</h2>
           <div className="cards-container">
             <Link to="/buscar" className="card">
               Busqueda de Sabores
             </Link>
-            <div className="card">Capelinas</div>
-            <div className="card">Capelinas</div>
-
-            <div className="card">Capelinas</div>
-            <div className="card">Bombones</div>
             <Link to="/sabores" className="card">
               Sabores
             </Link>

@@ -1,0 +1,312 @@
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  font-size: 1.2rem;
+}
+
+.error-container button {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  background-color: #ff6e72;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/*layoutprincipal: resumen y carrito lado a lado*/
+.helado-main {
+  display: flex;
+  flex-direction: row;
+  gap: 2.5rem;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.helado-resumen-box {
+  flex: 1;
+  min-width: 220px;
+  max-width: 350px;
+  text-align: left;
+}
+
+.helado-resumen-titulo {
+  color: #ff6e72;
+  margin-bottom: 0.5rem;
+}
+
+.helado-resumen-item {
+  display: inline-block;
+  margin: 4px 8px 4px 0;
+  padding: 4px 12px;
+  background: #fff0f6;
+  color: #ff6e72;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 1em;
+}
+
+.helado-confirmar {
+  margin-top: 1rem;
+  font-weight: bold;
+  font-size: 1.1em;
+  width: 100%;
+}
+
+.helado-carrito-box {
+  flex: 1;
+  min-width: 220px;
+  max-width: 350px;
+  background: #fff;
+  border: 2px solid #0077cc;
+  border-radius: 18px;
+  padding: 1.2rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.helado-carrito-titulo {
+  color: #0077cc;
+  margin-bottom: 0.5rem;
+}
+
+.helado-carrito-vacio {
+  color: #888;
+  font-size: 1em;
+  margin-top: 1rem;
+}
+
+.helado-carrito-lista {
+  list-style: none;
+  padding: 0;
+}
+
+.helado-carrito-item {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e6e6e6;
+  padding-bottom: 8px;
+}
+
+/*Grilla de selección de helado*/
+.helado-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  align-items: flex-start;
+}
+
+/*Botones de selección*/
+.helado-btn {
+  background: #fff;
+  border: 2px solid #0077cc;
+  color: #ff6e72;
+  padding: 8px 16px;
+  margin: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+.helado-btn.selected {
+  background: #aee;
+  color: #222;
+  border-color: #0077cc;
+}
+.helado-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/*Título de cada columna*/
+.helado-col h3 {
+  margin-bottom: 8px;
+  color: #ff6e72;
+}
+
+/*Resumen del helado*/
+.helado-resumen {
+  font-weight: bold;
+  color: black;
+}
+.helado-resumen span {
+  color: #ff6e72;
+}
+
+/* Mi pedido / carrito */
+.mi-pedido-container {
+  margin-top: 2rem;
+}
+.mi-pedido-titulo {
+  color: #ff6e72;
+  margin: 0 0 0.5rem 0;
+}
+.mi-pedido-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.mi-pedido-item {
+  margin-bottom: 8px;
+}
+.helado-chip {
+  margin-right: 8px;
+  display: inline-block;
+}
+
+/* Nuevo diseño: tarjeta blanca con pasos */
+.haztu-card {
+  background: #ffffff;
+  border: 2px solid #e6e6e6;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  max-width: 920px;
+  margin: 1rem auto;
+}
+.haztu-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.haztu-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #65b7da; /* azul claro de la paleta */
+}
+.haztu-step-subtitle {
+  color: #666;
+  font-size: 0.95rem;
+}
+.haztu-grid-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.haztu-grid-single {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.8rem;
+}
+.haztu-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.haztu-btn-primary {
+  background: #65b7da; /* azul claro */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.haztu-btn-secondary {
+  background: transparent;
+  color: #65b7da;
+  border: 2px solid #65b7da;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.mini-carrito {
+  background: #fff7ba; /* tono suave amarillo de la paleta */
+  border: 1px dashed #fcba78;
+  padding: 0.8rem;
+  border-radius: 10px;
+}
+.pagar-btn {
+  margin-top: 0.75rem;
+  width: 100%;
+  background: #ff6e72; /* color principal */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.step-indicator {
+  display: flex;
+  gap: 0.5rem;
+}
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e6e6e6;
+}
+.step-dot.active {
+  background: #65b7da;
+}
+
+/*
+  Cucurucho Simple   
+.cucurucho-simple {
+  width: 0;
+  height: 0;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-top: 120px solid #e6ae54;
+}
+
+  Cucurucho Doble   
+.contenedor-cucurucho-doble {
+  display: flex;
+}
+
+.cucurucho-doble {
+  width: 0;
+  height: 0;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-top: 120px solid #e6ae54;
+}
+
+.semicirculo-1 {
+  width: 50px;
+  height: 40px;
+  background: #e6ae54;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 80px;
+  border-bottom-right-radius: 80px;
+  transform: translateX(-100px);
+}
+
+.semicirculo-2 {
+  width: 50px;
+  height: 40px;
+  background: #e6ae54;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 80px;
+  border-bottom-right-radius: 80px;
+  transform: translateX(-80px);
+}
+
+  Cucurucho tipo Capelina   
+.cucurucho-capelina {
+  width: 120px;
+  height: 40px;
+  background: #e6ae54;
+  border-bottom-left-radius: 80px;
+  border-bottom-right-radius: 80px;
+}
+
+  Pote de 1kg de helado   
+.pote-kg {
+  width: 60px;
+  height: 28px;
+  background: #e6ae54;
+}
+ */

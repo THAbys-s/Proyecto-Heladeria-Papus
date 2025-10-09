@@ -1,0 +1,46 @@
+p {
+  color: black;
+}
+
+h2 {
+  color: #ff6e72;
+}
+.nosotros-imagenes {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin: 50px 0;
+}
+
+.postres-bombones {
+  width: 500px;
+}
+
+.mapa-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 60px 0;
+  gap: 50px;
+}
+
+.mapa-cuadrado,
+.mapa-imagen-local {
+  width: 500px;
+  height: 400px;
+  border: 0;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.nosotros-imagen {
+  width: 1050px;
+  height: 500px;
+  margin: 50px 0;
+
+  border-radius: 30px;
+}
+
+.anuncio-imagen {
+  width: 500px;
+  border-radius: 30px;
+}
