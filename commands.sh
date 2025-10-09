@@ -13,3 +13,5 @@ pip install flask-cors
 pip install cryptography
 
 npm install react-icons
+
+npm i @paypal/react-paypal-js
