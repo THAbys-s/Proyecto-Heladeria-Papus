@@ -1,0 +1,236 @@
+/* ---------------- Navbar ---------------- */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #ff6e72;
+  border-bottom: 2px solid #dd7e6b;
+  color: white;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo img {
+  width: 130px;
+  height: 45px;
+}
+
+/* ---------------- Menu ---------------- */
+.navbar-menu {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+/* ---------------- Menu-item con cuadro ---------------- */
+.menu-item {
+  position: relative;
+}
+
+/* El link ocupa TODO el cuadro */
+.menu-item > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 20px;
+  background-color: #ffffff;
+  border: 2px solid #ffa9ac;
+  border-radius: 12px;
+  color: #ff6e72;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.menu-item > a:hover {
+  background-color: #ffa9ac;
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------------- Dropdown imágenes ---------------- */
+.dropdown {
+  position: absolute;
+  top: 85px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background-color: white;
+  border-radius: 8px;
+  width: 180px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 9999;
+}
+
+.menu-item:hover .dropdown {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown img {
+  width: 100%;
+  display: block;
+}
+
+/* ---------------- Dropdown vertical ---------------- */
+.dropdown-vertical {
+  position: absolute;
+  left: 50%;
+  top: 85px;
+  transform: translateX(-50%) translateY(-10px);
+  background-color: white;
+  border-radius: 8px;
+  width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 9999;
+}
+
+.menu-item:hover .dropdown-vertical {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-vertical a {
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 0;
+  color: #ff6e72;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+  border: 0.1rem solid #ffa9ac;
+}
+
+.dropdown-vertical a:hover {
+  background-color: #ffa9ac;
+  color: black;
+}
+
+/* ---------------- Card navbar extra ---------------- */
+.card-navbar {
+  width: 50px;
+  height: 50px;
+  background-color: #ffffff;
+  border: 2px solid #ff6e72;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.card-navbar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.menu-burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .menu-burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffa9ac;
+    border: 2px solid black;
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .menu-burger svg {
+    width: 24px;
+    height: 24px;
+    stroke: black; /* para las líneas del icono */
+  }
+
+  .navbar-menu {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: 200px;
+    background-color: #ff6e72;
+    max-height: calc(100vh - 60px);
+    height: auto;
+    overflow-y: auto;
+    flex-direction: column;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+    transition: transform 0.3s ease;
+    transform: translateX(100%);
+  }
+
+  .navbar-menu .card {
+    font-size: 1rem;
+    padding: 8px 12px;
+    width: auto;
+  }
+
+  .navbar-menu.show-menu {
+    display: flex;
+    transform: translateX(0);
+  }
+
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
+  .navbar-menu li {
+    margin: 1rem 0;
+    text-align: center;
+  }
+
+  .menu-item > a {
+    width: auto;
+    padding: 8px 12px;
+  }
+
+  .dropdown,
+  .dropdown-vertical {
+    display: none !important;
+  }
+
+  .navbar-menu li:last-child > a {
+    width: auto;
+    padding: 8px 12px;
+  }
+}

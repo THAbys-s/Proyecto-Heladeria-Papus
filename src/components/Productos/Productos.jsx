@@ -1,0 +1,202 @@
+import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./productos.css";
+
+const imgUrls = {
+  "Crujido Tentador":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-crocante_pjggzf.jpg",
+  "Boscado Celestial":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-escoces_etximj.jpg",
+  "Dulce Suspiro":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-split_jzocao.jpg",
+  "Duo Delicia":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/bombon-suizo_uajm0g.jpg",
+  "Vainilla Sueño":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/capelinas-chocolate_dvqf1s.jpg",
+  "Frescura Tropical":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933010/capelinas-frutal_ecktij.jpg",
+  "Frutilla Encantada":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933012/capelinas-frutilla_e4xxhj.jpg",
+  "Chocolate Divino":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/capelinas-nuez_nkkhlx.jpg",
+  "Palito Bombón":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palito-bombon_x3wdc7.jpg",
+  "Palito Vainillita":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palitocremoso-americana_ncrz23.jpg",
+  "Palito Rosado":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933019/palitocremoso-frutilla_bkwwo7.jpg",
+  "Crujido Almendrado":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-almendrado_nmfxwe.jpg",
+  "Trio Tentador":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-cassata_n4nmcp.jpg",
+  "Sueño Chocolatoso":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-crocantino_ewicb2.jpg",
+  "Beso De Amor":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/postres-delicia_lsyjoo.jpg",
+  "Sundae Frutal":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933028/sundae-frutal_fgxdi3.jpg",
+  "Sundae Go":
+    "https://res.cloudinary.com/dwwzeq55r/image/upload/v1759933035/sundae-go_zhnr5w.jpg",
+};
+
+const Productos = () => {
+  const [productos, setProductos] = useState([]);
+  const [carrito, setCarrito] = useState([]);
+  const [mostrarMenu, setMostrarMenu] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("/api/productos")
+      .then((res) => res.json())
+      .then((data) => {
+        // Asignar la URL correcta de imagen a cada producto según nombre
+        const productosConImg = data.map((p) => ({
+          ...p,
+          img: imgUrls[p.nombre] || "",
+        }));
+        setProductos(productosConImg);
+      })
+      .catch((error) => console.error("Error cargando productos:", error));
+  }, []);
+
+  useEffect(() => {
+    const h = Math.max(300, 80 + carrito.length * 60);
+    document.documentElement.style.setProperty("--cart-height", `${h}px`);
+  }, [carrito.length]);
+
+  const agregarAlCarrito = (producto) => {
+    setCarrito((prev) => {
+      const existe = prev.find((i) => i.id === producto.id);
+      return existe
+        ? prev.map((i) =>
+            i.id === producto.id ? { ...i, cantidad: i.cantidad + 1 } : i
+          )
+        : [...prev, { ...producto, cantidad: 1 }];
+    });
+  };
+
+  const quitarDelCarrito = (productoId) => {
+    setCarrito((prev) =>
+      prev
+        .map((i) =>
+          i.id === productoId ? { ...i, cantidad: i.cantidad - 1 } : i
+        )
+        .filter((i) => i.cantidad > 0)
+    );
+  };
+
+  const carritoItems = useMemo(
+    () => (
+      <ul className="list-unstyled">
+        {carrito.map((item) => (
+          <li key={item.id} className="cart-row">
+            <span className="carrito-item">
+              <span className="cantidad">{item.cantidad}x</span> {item.nombre} -
+              ${item.precio.toLocaleString()}
+            </span>
+            <button
+              className="btn-link quitar-del-carrito"
+              onClick={() => quitarDelCarrito(item.id)}
+              title="Quitar uno"
+            >
+              Quitar
+            </button>
+          </li>
+        ))}
+      </ul>
+    ),
+    [carrito]
+  );
+
+  const finalizarCompraBtn = useMemo(
+    () =>
+      carrito.length > 0 && (
+        <button
+          className="btn btn-submit finalizar-compra-btn"
+          onClick={() => setMostrarMenu(true)}
+        >
+          Finalizar Compra
+        </button>
+      ),
+    [carrito.length]
+  );
+
+  return (
+    <main className="container productos">
+      {/* Botón Personaliza tu Helado, arriba de la grilla */}
+      <div className="boton-producto" style={{ marginBottom: "1.5rem" }}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/crea-tu-helado")}
+        >
+          Personaliza tu helado
+        </button>
+      </div>
+      <section className="productos-container">
+        <div className="productos-lista in-view">
+          {productos.map((producto) => (
+            <article key={producto.id} className="producto-card info-card">
+              <img
+                src={producto.img}
+                alt={producto.nombre}
+                className="producto-img"
+              />
+              <div className="producto-info">
+                <h3>{producto.nombre}</h3>
+                <div className="producto-precio">
+                  <span className="precio-original">
+                    ${producto.precioOriginal.toLocaleString()}
+                  </span>
+                  <span className="precio-descuento">
+                    ${producto.precio.toLocaleString()}
+                  </span>
+                  <span className="descuento">-{producto.descuento}%</span>
+                </div>
+                <button
+                  className="btn btn-primary agregar-carrito"
+                  onClick={() => agregarAlCarrito(producto)}
+                >
+                  Agregar al carrito
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <aside className="carrito-sidebar h-dynamic" aria-label="Mi pedido">
+          <h3>Mi pedido</h3>
+          {carrito.length === 0 ? (
+            <p className="muted">Tu pedido está vacío</p>
+          ) : (
+            <>
+              {carritoItems}
+              {finalizarCompraBtn}
+            </>
+          )}
+        </aside>
+      </section>
+
+      {mostrarMenu && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <div className="modal-contenido">
+            <h2 id="modal-title">Finalizar Compra</h2>
+            <p>Aquí puedes continuar con el proceso de pago...</p>
+            <button
+              className="btn btn-submit"
+              onClick={() => setMostrarMenu(false)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+};
+
+export default Productos;
