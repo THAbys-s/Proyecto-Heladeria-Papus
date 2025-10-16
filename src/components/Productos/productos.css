@@ -1,10 +1,10 @@
 :root {
-  --color-danger: #ff6e72; /* rojo-rosa intenso */
-  --color-danger-light: #ffa9ac; /* rosa claro */
-  --color-primary: #65b7da; /* azul */
-  --color-accent: #fcba78; /* naranja */
-  --color-accent-dark: #dd7e6b; /* naranja oscuro */
-  --color-accent-light: #fff7ba; /* amarillo pastel */
+  --color-danger: #ff6e72;
+  --color-danger-light: #ffa9ac;
+  --color-primary: #65b7da;
+  --color-accent: #fcba78;
+  --color-accent-dark: #dd7e6b;
+  --color-accent-light: #fff7ba;
 
   --radius: 10px;
   --white: #fff;
@@ -79,33 +79,35 @@
   padding: clamp(16px, 3vw, 32px);
 }
 
-/* Layout productos */
+/* Layout principal: productos + carrito */
 .productos-container {
   display: flex;
-  justify-content: space-between;
   gap: 2rem;
   align-items: flex-start;
 }
 
-.productos-lista {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1.9rem;
-  flex: 1 1 auto;
+/* Wrapper productos: grilla + paginación */
+.productos-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Card producto con animación */
+/* Grilla de productos */
+.productos-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card producto */
 .producto-card {
   border-radius: 18px;
   border: 1px solid var(--border);
   background: var(--white);
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(15, 17, 21, 0.1); /* var(--black) con opacidad */
+  box-shadow: 0 4px 8px rgba(15, 17, 21, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin: 0 auto;
-  max-width: 200px;
-  min-width: 160px;
-  width: 100%;
   display: flex;
   flex-direction: column;
   height: 280px;
@@ -113,7 +115,7 @@
 
 .producto-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(15, 17, 21, 0.12); /* var(--black) con opacidad */
+  box-shadow: 0 8px 16px rgba(15, 17, 21, 0.12);
 }
 
 /* Imagen producto */
@@ -127,8 +129,10 @@
 .producto-info {
   padding: 0.7rem;
   width: 100%;
-  height: 70px;
-  box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .producto-info h3 {
@@ -169,21 +173,47 @@
   font-weight: 600;
 }
 
+/* Paginación debajo de la grilla */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 0.7rem;
+  color: black;
+}
+
+.paginacion button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: black;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.paginacion button:hover:not(:disabled) {
+  color: black;
+  transform: scale(1.2);
+}
+
+.paginacion button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Sidebar carrito */
 .carrito-sidebar {
-  top: 100px;
-  right: 2rem;
   width: 300px;
   background-color: var(--color-accent-light);
   padding: 1rem;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(15, 17, 21, 0.1); /* var(--black) con opacidad */
+  box-shadow: 0 4px 8px rgba(15, 17, 21, 0.1);
   min-height: 300px;
   max-height: 600px;
   overflow-y: auto;
   transition: height 0.3s ease;
-  z-index: 0;
   color: var(--black);
+  flex-shrink: 0;
 }
 
 .h-dynamic {
@@ -193,7 +223,6 @@
 .carrito-sidebar h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--black);
   margin: 0 0 0.4rem;
 }
 
@@ -218,7 +247,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 17, 21, 0.4); /* var(--black) con opacidad */
+  background: rgba(15, 17, 21, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -230,59 +259,115 @@
   width: min(600px, 90vw);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(15, 17, 21, 0.25); /* var(--black) con opacidad */
-  position: relative;
+  box-shadow: 0 6px 20px rgba(15, 17, 21, 0.25);
   text-align: center;
 }
 
-/* Grilla responsiva para tickets/productos */
-.tickets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  width: 100%;
-}
-
-/* Ajuste de tamaño máximo para las tarjetas dentro de la grilla */
-.tickets-grid .producto-card {
-  max-width: 200px;
-  min-width: 160px;
-  width: 100%;
-  margin: 0 auto;
-  height: 280px;
-}
-
-/* Ajuste de imagen producto */
-.producto-img {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-}
-
-/* Info producto */
-.producto-info {
-  padding: 0.7rem;
-  width: 100%;
-  height: 70px;
-  box-sizing: border-box;
-}
-
-/* Responsive para pantallas pequeñas */
-@media (max-width: 600px) {
-  .tickets-grid {
-    grid-template-columns: 1fr;
-    gap: 0.7rem;
+/* Responsive */
+@media (max-width: 900px) {
+  .productos-container {
+    flex-direction: column;
   }
-  .tickets-grid .producto-card {
-    max-width: 100%;
-    min-width: 140px;
+  .carrito-sidebar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .productos-lista {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .producto-card {
     height: 220px;
   }
+
   .producto-img {
     height: 70px;
   }
+
   .producto-info {
     padding: 0.5rem;
-    height: 50px;
+    height: auto;
   }
+}
+
+/* --- Ajustes de grilla para 3 columnas x 2 filas --- */
+.productos-lista {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* siempre 3 columnas */
+  grid-auto-rows: auto;
+  gap: 1rem;
+}
+
+/* --- Cards más pequeñas --- */
+.producto-card {
+  max-width: 160px; /* antes 200px */
+  min-width: 140px; /* antes 160px */
+  height: 220px; /* antes 280px */
+  border-radius: 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 3px 6px rgba(15, 17, 21, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin: 0 auto;
+}
+
+.producto-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(15, 17, 21, 0.1);
+}
+
+/* --- Imagen más pequeña --- */
+.producto-img {
+  width: 100%;
+  height: 80px; /* antes 100px */
+  object-fit: cover;
+}
+
+/* --- Info producto más compacta --- */
+.producto-info {
+  padding: 0.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.producto-info h3 {
+  font-size: 0.85rem; /* antes 0.95rem */
+  margin: 0 0 0.15rem;
+}
+
+/* --- Precios más compactos --- */
+.producto-precio {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+.precio-original {
+  font-size: 0.75rem;
+}
+
+.precio-descuento {
+  font-size: 0.85rem;
+}
+
+.descuento {
+  font-size: 0.7rem;
+  padding: 0.12rem 0.25rem;
+  border-radius: 4px;
+}
+
+/* --- Botones más pequeños --- */
+.btn-primary.agregar-carrito {
+  font-size: 0.8rem;
+  padding: 6px 10px;
 }

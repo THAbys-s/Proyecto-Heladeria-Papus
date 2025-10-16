@@ -1,7 +1,6 @@
 .venv/
 
 *.pyc
-__pycache__/
 
 instance/
 
@@ -39,7 +38,7 @@ dist-ssr
 COMANDOS.md
 
 # Ignorar archivos de entorno y pruebas
-.env/
 test.py
-
+.env
 node_modules/
+__pycache__/
