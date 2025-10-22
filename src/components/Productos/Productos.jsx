@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./productos.css";
+import PaypalButton from "../PaypalButton/PaypalButton.jsx";
 
 // --- ICONOS NUEVOS ---
 import {
@@ -129,7 +130,7 @@ const Productos = () => {
           className="btn btn-submit finalizar-compra-btn"
           onClick={() => setMostrarMenu(true)}
         >
-          Finalizar Compra
+          Pagar
         </button>
       ),
     [carrito.length]
@@ -251,9 +252,43 @@ const Productos = () => {
           <div className="modal-contenido">
             <h2 id="modal-title">Finalizar Compra</h2>
             <p>Aquí puedes continuar con el proceso de pago...</p>
+
+            {/* Mostrar resumen y botón de pago */}
+            <div style={{ margin: "1rem 0" }}>
+              <strong>Resumen:</strong>
+              <div style={{ marginTop: 8 }}>{carritoItems}</div>
+              <div style={{ marginTop: 8, fontWeight: 700 }}>
+                Total: $
+                {carrito
+                  .reduce((sum, it) => sum + (it.precio || 0) * it.cantidad, 0)
+                  .toLocaleString()}
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <PaypalButton
+                amount={carrito.reduce(
+                  (sum, it) => sum + (it.precio || 0) * it.cantidad,
+                  0
+                )}
+                currency={"USD"}
+                description={`Compra de ${carrito.length} producto(s)`}
+                onSuccess={(details) => {
+                  alert(
+                    `Pago completado por ${
+                      details.payer?.name?.given_name || "cliente"
+                    }`
+                  );
+                  setCarrito([]);
+                  setMostrarMenu(false);
+                }}
+              />
+            </div>
+
             <button
               className="btn btn-submit"
               onClick={() => setMostrarMenu(false)}
+              style={{ marginTop: 10 }}
             >
               Cerrar
             </button>
