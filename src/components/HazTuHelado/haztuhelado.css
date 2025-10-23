@@ -223,13 +223,15 @@
   font-weight: 600;
 }
 .mini-carrito {
+  max-height: 80vh;
   background: var(--color-accent-light); /* tono suave amarillo de la paleta */
   border: 1px dashed var(--color-accent);
-
   padding: 0.8rem;
   border-radius: 10px;
   color: var(--black);
+  overflow-y: auto;
 }
+
 .pagar-btn {
   margin-top: 0.75rem;
   width: 100%;

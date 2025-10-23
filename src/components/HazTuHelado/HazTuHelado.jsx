@@ -16,7 +16,10 @@ const HazTuHelado = () => {
   const [selectedEspeciales, setSelectedEspeciales] = useState([]);
   const [selectedBocadillo, setSelectedBocadillo] = useState("");
   const [selectedSalsa, setSelectedSalsa] = useState("");
-  const [carrito, setCarrito] = useState([]);
+  const [carrito, setCarrito] = useState(() => {
+    const savedCart = localStorage.getItem("carritoHelados");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
   const [step, setStep] = useState(0); // 0: cucurucho, 1: sabores, 2: bocadillo, 3: salsas, 4: revisión/confirmar
 
   useEffect(() => {
@@ -142,6 +145,10 @@ const HazTuHelado = () => {
   };
 
   // Agregar al carrito
+  useEffect(() => {
+    localStorage.setItem("carritoHelados", JSON.stringify(carrito));
+  }, [carrito]);
+
   const confirmarHelado = () => {
     const helado = {
       cucurucho: selectedCucurucho,
@@ -469,6 +476,7 @@ const HazTuHelado = () => {
                     alert(
                       `Pago completado por ${details.payer.name.given_name}`
                     );
+
                     setCarrito([]); // vacía el carrito tras el pago
                   }}
                 />
