@@ -12,7 +12,15 @@ from flask_cors import CORS
 
 from functools import wraps
 
+import requests
+
 load_dotenv(".env/development.env")
+
+
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
+PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
+PAYPAL_API_BASE = os.getenv("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com")
+
 
 app = Flask(__name__)
 
@@ -46,6 +54,76 @@ CORS(app,resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0
 #                                           #
 # RUTAS DE PRUEBA Y CONEXIÓN DB EN LA NUBE. #
 #                                           #
+
+
+#                                           #
+#                Paypal                     #
+#                                           #
+@app.route('/api/create-order', methods=['POST'])
+def create_order():
+    data = request.get_json()
+    total = data.get('total', '10.00')  # valor por defecto
+    currency = data.get('currency', 'USD')
+
+    # Obtener token de acceso PayPal
+    auth = (PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
+    token_response = requests.post(f"{PAYPAL_API_BASE}/v1/oauth2/token",
+                                   auth=auth,
+                                   data={"grant_type": "client_credentials"})
+    token = token_response.json()['access_token']
+
+    # Crear orden
+    order_response = requests.post(
+        f"{PAYPAL_API_BASE}/v2/checkout/orders",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        },
+        json={
+            "intent": "CAPTURE",
+            "purchase_units": [{
+                "amount": {
+                    "currency_code": currency,
+                    "value": total
+                }
+            }]
+        }
+    )
+
+    return jsonify(order_response.json())
+
+
+
+@app.route('/api/capture-order/<order_id>', methods=['POST'])
+def capture_order(order_id):
+    auth = (PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
+    token_response = requests.post(f"{PAYPAL_API_BASE}/v1/oauth2/token",
+                                   auth=auth,
+                                   data={"grant_type": "client_credentials"})
+    token = token_response.json()['access_token']
+
+    capture_response = requests.post(
+        f"{PAYPAL_API_BASE}/v2/checkout/orders/{order_id}/capture",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+    )
+
+    return jsonify(capture_response.json())
+
+
+@app.route('/api/paypal-client-id', methods=['GET'])
+def paypal_client_id():
+    """Devuelve el client id de PayPal (público) para que el frontend pueda inicializar el SDK.
+
+    Nota: el client id no es sensible y puede exponerse al cliente. Las credenciales secretas
+    (client secret) deben permanecer en el servidor.
+    """
+    return jsonify({"clientId": PAYPAL_CLIENT_ID or ""})
+
+
+
 
 
 # Abrir la conexión a la base de datos

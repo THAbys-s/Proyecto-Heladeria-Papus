@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./productos.css";
+import PaypalButton from "../PaypalButton/PaypalButton.jsx";
 
 // --- ICONOS NUEVOS ---
 import {
@@ -49,7 +50,10 @@ const imgUrls = {
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
-  const [carrito, setCarrito] = useState([]);
+  const [carrito, setCarrito] = useState(() => {
+    const savedCart = localStorage.getItem("carrito");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
   const [paginaActual, setPaginaActual] = useState(1);
   const productosPorPagina = 6;
   const [mostrarMenu, setMostrarMenu] = useState(false);
@@ -73,11 +77,18 @@ const Productos = () => {
   const productosVisibles = productos.slice(indexInicio, indexFin);
   const totalPaginas = Math.ceil(productos.length / productosPorPagina);
 
+  // --- Guardar carrito en localStorage cada vez que cambie ---
+  useEffect(() => {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+  }, [carrito]);
+
+  // --- Ajustar altura dinámica del carrito ---
   useEffect(() => {
     const h = Math.max(300, 80 + carrito.length * 60);
     document.documentElement.style.setProperty("--cart-height", `${h}px`);
   }, [carrito.length]);
 
+  // --- Funciones para agregar/quitar productos ---
   const agregarAlCarrito = (producto) => {
     setCarrito((prev) => {
       const existe = prev.find((i) => i.id === producto.id);
@@ -99,6 +110,24 @@ const Productos = () => {
     );
   };
 
+  // --- Función para finalizar compra ---
+  const finalizarCompra = () => {
+    // Guardar carrito final en historial
+    const historial = JSON.parse(
+      localStorage.getItem("historialCompras") || "[]"
+    );
+    historial.push({
+      fecha: new Date().toISOString(),
+      items: carrito,
+    });
+    localStorage.setItem("historialCompras", JSON.stringify(historial));
+
+    // Vaciar carrito actual
+    setCarrito([]);
+    setMostrarMenu(false);
+  };
+
+  // --- Renderizado del carrito ---
   const carritoItems = useMemo(
     () => (
       <ul className="list-unstyled">
@@ -129,7 +158,7 @@ const Productos = () => {
           className="btn btn-submit finalizar-compra-btn"
           onClick={() => setMostrarMenu(true)}
         >
-          Finalizar Compra
+          Pagar
         </button>
       ),
     [carrito.length]
@@ -251,9 +280,42 @@ const Productos = () => {
           <div className="modal-contenido">
             <h2 id="modal-title">Finalizar Compra</h2>
             <p>Aquí puedes continuar con el proceso de pago...</p>
+
+            {/* Mostrar resumen y botón de pago */}
+            <div style={{ margin: "1rem 0" }}>
+              <strong>Resumen:</strong>
+              <div style={{ marginTop: 8 }}>{carritoItems}</div>
+              <div style={{ marginTop: 8, fontWeight: 700 }}>
+                Total: $
+                {carrito
+                  .reduce((sum, it) => sum + (it.precio || 0) * it.cantidad, 0)
+                  .toLocaleString()}
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <PaypalButton
+                amount={carrito.reduce(
+                  (sum, it) => sum + (it.precio || 0) * it.cantidad,
+                  0
+                )}
+                currency={"USD"}
+                description={`Compra de ${carrito.length} producto(s)`}
+                onSuccess={(details) => {
+                  alert(
+                    `Pago completado por ${
+                      details.payer?.name?.given_name || "cliente"
+                    }`
+                  );
+                  finalizarCompra();
+                }}
+              />
+            </div>
+
             <button
               className="btn btn-submit"
               onClick={() => setMostrarMenu(false)}
+              style={{ marginTop: 10 }}
             >
               Cerrar
             </button>
