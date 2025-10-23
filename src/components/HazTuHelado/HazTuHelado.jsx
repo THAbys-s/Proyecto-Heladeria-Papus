@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./haztuhelado.css";
+import PaypalButton from "../PaypalButton/PaypalButton.jsx";
 
 const HazTuHelado = () => {
   const [sabores, setSabores] = useState([]);
@@ -458,9 +459,20 @@ const HazTuHelado = () => {
                 ))}
               </ul>
             )}
-            <button className="pagar-btn" disabled={carrito.length === 0}>
-              Pagar
-            </button>
+            {carrito.length > 0 && (
+              <div style={{ marginTop: "10px" }}>
+                <PaypalButton
+                  amount={12000} // 👈 poné acá el total real si querés
+                  description={`Compra de ${carrito.length} helado(s) personalizados`}
+                  onSuccess={(details) => {
+                    alert(
+                      `Pago completado por ${details.payer.name.given_name}`
+                    );
+                    setCarrito([]); // vacía el carrito tras el pago
+                  }}
+                />
+              </div>
+            )}
             <button
               className="haztu-btn-secondary"
               style={{ marginTop: 8 }}

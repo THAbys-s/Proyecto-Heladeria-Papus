@@ -1,6 +1,15 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./productos.css";
+import PaypalButton from "../PaypalButton/PaypalButton.jsx";
+
+// --- ICONOS NUEVOS ---
+import {
+  TiArrowBack,
+  TiArrowForward,
+  TiArrowLeft,
+  TiArrowRight,
+} from "react-icons/ti";
 
 const imgUrls = {
   "Crujido Tentador":
@@ -42,6 +51,8 @@ const imgUrls = {
 const Productos = () => {
   const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const productosPorPagina = 6;
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const navigate = useNavigate();
 
@@ -49,7 +60,6 @@ const Productos = () => {
     fetch("/api/productos")
       .then((res) => res.json())
       .then((data) => {
-        // Asignar la URL correcta de imagen a cada producto según nombre
         const productosConImg = data.map((p) => ({
           ...p,
           img: imgUrls[p.nombre] || "",
@@ -58,6 +68,11 @@ const Productos = () => {
       })
       .catch((error) => console.error("Error cargando productos:", error));
   }, []);
+
+  const indexInicio = (paginaActual - 1) * productosPorPagina;
+  const indexFin = indexInicio + productosPorPagina;
+  const productosVisibles = productos.slice(indexInicio, indexFin);
+  const totalPaginas = Math.ceil(productos.length / productosPorPagina);
 
   useEffect(() => {
     const h = Math.max(300, 80 + carrito.length * 60);
@@ -115,7 +130,7 @@ const Productos = () => {
           className="btn btn-submit finalizar-compra-btn"
           onClick={() => setMostrarMenu(true)}
         >
-          Finalizar Compra
+          Pagar
         </button>
       ),
     [carrito.length]
@@ -123,7 +138,7 @@ const Productos = () => {
 
   return (
     <main className="container productos">
-      {/* Botón Personaliza tu Helado, arriba de la grilla */}
+      {/* Botón Personaliza tu Helado */}
       <div className="boton-producto" style={{ marginBottom: "1.5rem" }}>
         <button
           className="btn btn-primary"
@@ -132,37 +147,87 @@ const Productos = () => {
           Personaliza tu helado
         </button>
       </div>
+
       <section className="productos-container">
-        <div className="productos-lista in-view">
-          {productos.map((producto) => (
-            <article key={producto.id} className="producto-card info-card">
-              <img
-                src={producto.img}
-                alt={producto.nombre}
-                className="producto-img"
-              />
-              <div className="producto-info">
-                <h3>{producto.nombre}</h3>
-                <div className="producto-precio">
-                  <span className="precio-original">
-                    ${producto.precioOriginal.toLocaleString()}
-                  </span>
-                  <span className="precio-descuento">
-                    ${producto.precio.toLocaleString()}
-                  </span>
-                  <span className="descuento">-{producto.descuento}%</span>
+        {/* === LISTA DE PRODUCTOS === */}
+        <div className="productos-wrapper">
+          <div className="productos-lista in-view">
+            {productosVisibles.map((producto) => (
+              <article key={producto.id} className="producto-card info-card">
+                <img
+                  src={producto.img}
+                  alt={producto.nombre}
+                  className="producto-img"
+                />
+                <div className="producto-info">
+                  <h3>{producto.nombre}</h3>
+                  <div className="producto-precio">
+                    <span className="precio-original">
+                      ${producto.precioOriginal.toLocaleString()}
+                    </span>
+                    <span className="precio-descuento">
+                      ${producto.precio.toLocaleString()}
+                    </span>
+                    <span className="descuento">-{producto.descuento}%</span>
+                  </div>
+                  <button
+                    className="btn btn-primary agregar-carrito"
+                    onClick={() => agregarAlCarrito(producto)}
+                  >
+                    Agregar al carrito
+                  </button>
                 </div>
-                <button
-                  className="btn btn-primary agregar-carrito"
-                  onClick={() => agregarAlCarrito(producto)}
-                >
-                  Agregar al carrito
-                </button>
-              </div>
-            </article>
-          ))}
+              </article>
+            ))}
+          </div>
+
+          {/* === PAGINACIÓN DEBAJO DE LA GRILLA === */}
+          <div className="paginacion centrada">
+            <button
+              className="btn-link"
+              onClick={() => setPaginaActual(1)}
+              disabled={paginaActual === 1}
+              title="Primera página"
+            >
+              <TiArrowBack size={20} />
+            </button>
+
+            <button
+              className="btn-link"
+              onClick={() => setPaginaActual((p) => Math.max(p - 1, 1))}
+              disabled={paginaActual === 1}
+              title="Página anterior"
+            >
+              <TiArrowLeft size={22} />
+            </button>
+
+            <span style={{ margin: "0 1rem", fontWeight: "600" }}>
+              {paginaActual} / {totalPaginas}
+            </span>
+
+            <button
+              className="btn-link"
+              onClick={() =>
+                setPaginaActual((p) => Math.min(p + 1, totalPaginas))
+              }
+              disabled={paginaActual === totalPaginas}
+              title="Página siguiente"
+            >
+              <TiArrowRight size={22} />
+            </button>
+
+            <button
+              className="btn-link"
+              onClick={() => setPaginaActual(totalPaginas)}
+              disabled={paginaActual === totalPaginas}
+              title="Última página"
+            >
+              <TiArrowForward size={22} />
+            </button>
+          </div>
         </div>
 
+        {/* === CARRITO === */}
         <aside className="carrito-sidebar h-dynamic" aria-label="Mi pedido">
           <h3>Mi pedido</h3>
           {carrito.length === 0 ? (
@@ -176,6 +241,7 @@ const Productos = () => {
         </aside>
       </section>
 
+      {/* === MODAL DE COMPRA === */}
       {mostrarMenu && (
         <div
           className="modal-overlay"
@@ -186,9 +252,43 @@ const Productos = () => {
           <div className="modal-contenido">
             <h2 id="modal-title">Finalizar Compra</h2>
             <p>Aquí puedes continuar con el proceso de pago...</p>
+
+            {/* Mostrar resumen y botón de pago */}
+            <div style={{ margin: "1rem 0" }}>
+              <strong>Resumen:</strong>
+              <div style={{ marginTop: 8 }}>{carritoItems}</div>
+              <div style={{ marginTop: 8, fontWeight: 700 }}>
+                Total: $
+                {carrito
+                  .reduce((sum, it) => sum + (it.precio || 0) * it.cantidad, 0)
+                  .toLocaleString()}
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <PaypalButton
+                amount={carrito.reduce(
+                  (sum, it) => sum + (it.precio || 0) * it.cantidad,
+                  0
+                )}
+                currency={"USD"}
+                description={`Compra de ${carrito.length} producto(s)`}
+                onSuccess={(details) => {
+                  alert(
+                    `Pago completado por ${
+                      details.payer?.name?.given_name || "cliente"
+                    }`
+                  );
+                  setCarrito([]);
+                  setMostrarMenu(false);
+                }}
+              />
+            </div>
+
             <button
               className="btn btn-submit"
               onClick={() => setMostrarMenu(false)}
+              style={{ marginTop: 10 }}
             >
               Cerrar
             </button>
