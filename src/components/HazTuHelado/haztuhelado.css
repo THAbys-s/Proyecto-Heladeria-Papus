@@ -11,8 +11,8 @@
 .error-container button {
   margin-top: 1rem;
   padding: 0.6rem 1rem;
-  background-color: #ff6e72;
-  color: white;
+  background-color: var(--color-danger);
+  color: var(--white);
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -36,7 +36,7 @@
 }
 
 .helado-resumen-titulo {
-  color: #ff6e72;
+  color: var(--color-danger);
   margin-bottom: 0.5rem;
 }
 
@@ -45,7 +45,7 @@
   margin: 4px 8px 4px 0;
   padding: 4px 12px;
   background: #fff0f6;
-  color: #ff6e72;
+  color: var(--color-danger);
   border-radius: 12px;
   font-weight: 500;
   font-size: 1em;
@@ -104,7 +104,7 @@
 .helado-btn {
   background: #fff;
   border: 2px solid #0077cc;
-  color: #ff6e72;
+  color: var(--color-danger);
   padding: 8px 16px;
   margin: 4px;
   border-radius: 8px;
@@ -125,34 +125,38 @@
 /*Título de cada columna*/
 .helado-col h3 {
   margin-bottom: 8px;
-  color: #ff6e72;
+  color: var(--color-danger);
 }
 
 /*Resumen del helado*/
 .helado-resumen {
   font-weight: bold;
-  color: black;
+  color: var(--black);
 }
 .helado-resumen span {
-  color: #ff6e72;
+  color: var(--color-danger);
 }
 
 /* Mi pedido / carrito */
 .mi-pedido-container {
   margin-top: 2rem;
 }
+
 .mi-pedido-titulo {
-  color: #ff6e72;
+  color: var(--color-danger);
   margin: 0 0 0.5rem 0;
 }
+
 .mi-pedido-lista {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .mi-pedido-item {
   margin-bottom: 8px;
 }
+
 .helado-chip {
   margin-right: 8px;
   display: inline-block;
@@ -160,7 +164,7 @@
 
 /* Nuevo diseño: tarjeta blanca con pasos */
 .haztu-card {
-  background: #ffffff;
+  background: var(--white);
   border: 2px solid #e6e6e6;
   border-radius: 14px;
   padding: 1.25rem;
@@ -178,7 +182,7 @@
 .haztu-step-title {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #65b7da; /* azul claro de la paleta */
+  color: var(--color-primary); /* azul claro de la paleta */
 }
 .haztu-step-subtitle {
   color: #666;
@@ -201,7 +205,7 @@
   margin-top: 1rem;
 }
 .haztu-btn-primary {
-  background: #65b7da; /* azul claro */
+  background: var(--color-primary); /* azul claro */
   color: white;
   border: none;
   padding: 10px 16px;
@@ -211,24 +215,26 @@
 }
 .haztu-btn-secondary {
   background: transparent;
-  color: #65b7da;
-  border: 2px solid #65b7da;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
 }
 .mini-carrito {
-  background: #fff7ba; /* tono suave amarillo de la paleta */
-  border: 1px dashed #fcba78;
+  background: var(--color-accent-light); /* tono suave amarillo de la paleta */
+  border: 1px dashed var(--color-accent);
+
   padding: 0.8rem;
   border-radius: 10px;
+  color: var(--black);
 }
 .pagar-btn {
   margin-top: 0.75rem;
   width: 100%;
-  background: #ff6e72; /* color principal */
-  color: white;
+  background: var(--color-danger); /* color principal */
+  color: var(--white);
   border: none;
   padding: 8px 12px;
   border-radius: 8px;
@@ -246,7 +252,7 @@
   background: #e6e6e6;
 }
 .step-dot.active {
-  background: #65b7da;
+  background: var(--color-primary);
 }
 
 /*

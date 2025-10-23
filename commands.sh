@@ -14,4 +14,6 @@ pip install cryptography
 
 npm install react-icons
 
+pip install requests
+
 npm i @paypal/react-paypal-js
