@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import Productos from "../src/components/Productos/Productos.jsx";
+import Productos from "../../src/components/Productos/Productos.jsx";
 
 // Función de comparación del json
 global.fetch = jest.fn(() =>

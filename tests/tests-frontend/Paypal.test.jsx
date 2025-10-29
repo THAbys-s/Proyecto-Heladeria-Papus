@@ -1,19 +1,19 @@
 import { render } from "@testing-library/react";
-import PayPalButton from "../src/components/PaypalButton/PaypalButton.jsx";
+import PayPalButton from "../../src/components/PaypalButton/PaypalButton.jsx";
 
 describe("PayPalButton Component - lógica", () => {
   let buttonsMock;
   let renderMock;
 
   beforeEach(() => {
-    // --- Limpiar cualquier mock previo y DOM ---
+    // --- Limpiar cualquier prueba anterior ---
     document.body.innerHTML = "";
     delete window.paypal;
 
-    // --- Mock de Buttons incluyendo createOrder y onApprove ---
+    // --- Botones de createOrder y onApprove (Simulados) ---
     renderMock = jest.fn();
     buttonsMock = jest.fn().mockImplementation((config) => {
-      // Guardamos las funciones para poder llamarlas en los tests
+      // Guarda las funciones para poder llamarlas en los tests
       return {
         render: renderMock,
         createOrder: config.createOrder,
@@ -23,7 +23,7 @@ describe("PayPalButton Component - lógica", () => {
 
     window.paypal = { Buttons: buttonsMock };
 
-    // --- Mock global.fetch para todos los endpoints de Paypal ---
+    // --- Conjunto para todos los endpoints de Paypal ---
     global.fetch = jest.fn((url) => {
       if (url.includes("/api/paypal-client-id"))
         return Promise.resolve({
@@ -65,15 +65,12 @@ describe("PayPalButton Component - lógica", () => {
     // Espera un poco para que el useEffect corra y llame a los Botones.
     await new Promise((r) => setTimeout(r, 50));
 
-    // --- Obtenemos la instancia mockeada con createOrder/onApprove ---
     const buttonsInstance = buttonsMock.mock.results[0].value;
 
-    // --- createOrder debe llamar a /api/create-order y devolver id ---
     const orderId = await buttonsInstance.createOrder();
     expect(orderId).toBe("ORDER123");
     expect(fetch).toHaveBeenCalledWith("/api/create-order", expect.any(Object));
 
-    // --- onApprove debe llamar a /api/capture-order y disparar onSuccess ---
     await buttonsInstance.onApprove({ orderID: "ORDER123" });
     expect(fetch).toHaveBeenCalledWith(
       "/api/capture-order/ORDER123",
