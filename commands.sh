@@ -1,3 +1,6 @@
+python3 -m venv .venv
+source .venv/bin/activate
+
 npm install react-router-dom
 
 pip install flask-login
@@ -14,6 +17,14 @@ pip install cryptography
 
 npm install react-icons
 
-pip install requests
+pip install Flask pytest pytest-cov
 
-npm i @paypal/react-paypal-js
+pip install requests faker
+
+npm install --save-dev jest babel-jest @babel/preset-env @babel/preset-react
+
+npm install --save-dev jsdom
+
+npm install --save-dev @testing-library/react @testing-library/jest-dom
+
+npm install --save-dev ts-jest @types/jest

@@ -153,7 +153,7 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-.menu-burger {
+.ice-cream-menu {
   display: none;
   background: none;
   border: none;
@@ -161,7 +161,7 @@
 }
 
 @media (max-width: 768px) {
-  .menu-burger {
+  .ice-cream-menu {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -174,7 +174,7 @@
     padding: 0;
   }
 
-  .menu-burger svg {
+  .ice-cream-menu svg {
     width: 24px;
     height: 24px;
     stroke: black; /* para las líneas del icono */

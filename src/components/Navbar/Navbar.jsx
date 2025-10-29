@@ -22,9 +22,9 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Icono menú hamburguesa para móviles */}
+        {/* Icono menú helado móviles */}
         <button
-          className="menu-burger"
+          className="ice-cream-menu"
           aria-label="Abrir menú"
           aria-expanded={menuAbierto}
           onClick={toggleMenu}

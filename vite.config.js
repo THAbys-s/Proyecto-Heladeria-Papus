@@ -16,4 +16,8 @@ export default defineConfig({
     host: "localhost", // fuerza Vite a servir desde 127.0.0.1
     port: 5173,
   },
+  test: {
+    setupFiles: "./tests/setupTests.js",
+    environment: "jsdom",
+  },
 });
