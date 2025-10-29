@@ -1,9 +1,8 @@
-// setupTests.js
 import "@testing-library/jest-dom";
-import { cleanup } from "@testing-library/react";
+import { TextEncoder, TextDecoder } from "util";
 
-afterEach(() => {
-  cleanup();
-});
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
-jest.mock("\\.(png|jpg|jpeg|gif)$", () => "mock-image");
+global.structuredClone =
+  global.structuredClone || ((obj) => JSON.parse(JSON.stringify(obj)));

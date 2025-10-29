@@ -5,7 +5,7 @@ export default {
   },
   moduleFileExtensions: ["js", "jsx", "json", "node"],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1", // Para usar alias como en Vite
+    "\\.(css)$": "identity-obj-proxy",
   },
   setupFilesAfterEnv: ["<rootDir>/tests/setupTests.js"],
   collectCoverage: true,
