@@ -5,7 +5,8 @@ export default {
   },
   moduleFileExtensions: ["js", "jsx", "json", "node"],
   moduleNameMapper: {
-    "\\.(css)$": "identity-obj-proxy",
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
   setupFilesAfterEnv: ["<rootDir>/tests/setupTests.js"],
   collectCoverage: true,
