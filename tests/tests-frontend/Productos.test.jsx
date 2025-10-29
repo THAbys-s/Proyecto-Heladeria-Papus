@@ -81,8 +81,8 @@ describe("Productos Component - flujo dinámico", () => {
     const prod1 = await screen.findByText("Crujido Tentador");
     const prod2 = await screen.findByText("Boscado Celestial");
 
-    expect(prod1).toBeInTheDocument();
-    expect(prod2).toBeInTheDocument();
+    expect(prod1).toBeVisible();
+    expect(prod2).toBeVisible();
   });
 
   // --- Test de imagenes dinámicas ---
@@ -103,7 +103,7 @@ describe("Productos Component - flujo dinámico", () => {
 
     // Botón Pagar aparece
     const pagarBtn = screen.getByText(/Pagar/i);
-    expect(pagarBtn).toBeInTheDocument();
+    expect(pagarBtn).toBeVisible();
 
     // LocalStorage se actualiza
     const carrito = JSON.parse(localStorage.getItem("carrito"));
@@ -122,8 +122,8 @@ describe("Productos Component - flujo dinámico", () => {
     fireEvent.click(pagarBtn);
 
     const modal = screen.getByRole("dialog");
-    expect(modal).toBeInTheDocument();
-    expect(screen.getByText(/Finalizar Compra/i)).toBeInTheDocument();
+    expect(modal).toBeVisible();
+    expect(screen.getByText(/Finalizar Compra/i)).toBeVisible();
   });
 
   // --- Test de quitar producto ---
@@ -150,15 +150,15 @@ describe("Productos Component - flujo dinámico", () => {
     setup();
 
     // Página 1: debería mostrar los primeros 6 productos
-    expect(await screen.findByText("Crujido Tentador")).toBeInTheDocument();
-    expect(screen.getByText("Frescura Tropical")).toBeInTheDocument();
+    expect(await screen.findByText("Crujido Tentador")).toBeVisible();
+    expect(screen.getByText("Frescura Tropical")).toBeVisible();
     expect(screen.queryByText("Frutilla Encantada")).toBeNull();
 
     // Ir a página 2
     const nextPageBtn = screen.getByTitle("Página siguiente");
     fireEvent.click(nextPageBtn);
 
-    expect(await screen.findByText("Frutilla Encantada")).toBeInTheDocument();
+    expect(await screen.findByText("Frutilla Encantada")).toBeVisible();
     expect(screen.queryByText("Crujido Tentador")).toBeNull();
   });
 });
