@@ -217,6 +217,35 @@ def obtener_sabores():
     nombres = [row['nombre_sabor'] for row in res]
     return jsonify(nombres)
 
+
+# --- NUEVA RUTA: devolver tiendas (sucursales) ---
+@app.route('/api/tiendas', methods=['GET'])
+def obtener_tiendas():
+    """Devuelve todas las tiendas (tienda_id y direccion)."""
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT tienda_id, direccion FROM tiendas")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    return jsonify(res)
+
+
+# Empleados por tienda
+@app.route('/api/tiendas/<int:tienda_id>/empleados', methods=['GET'])
+def obtener_empleados_por_tienda(tienda_id):
+    """Devuelve los empleados (nombre, apellido) que trabajan en la tienda indicada."""
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    # Se asume que existe una tabla 'empleados' con columnas 'nombre', 'apellido' y 'tienda_id'
+    # En la base de datos las columnas reales son nombre_empleado y apellido_empleado
+    cursor.execute(
+        "SELECT nombre_empleado AS nombre, apellido_empleado AS apellido FROM empleados WHERE tienda_id = %s",
+        (tienda_id,)
+    )
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    return jsonify(res)
+
 # Bocadillos
 @app.route('/api/bocadillos', methods=['GET'])
 def obtener_bocadillos():

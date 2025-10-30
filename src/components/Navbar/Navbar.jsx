@@ -75,6 +75,15 @@ const Navbar = () => {
           </li>
           <li className="menu-item">
             <Link
+              to="/sucursales"
+              className="card"
+              onClick={() => setMenuAbierto(false)}
+            >
+              Sucursales
+            </Link>
+          </li>
+          <li className="menu-item">
+            <Link
               to="/register"
               className="card"
               onClick={() => setMenuAbierto(false)}

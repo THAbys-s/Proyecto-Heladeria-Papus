@@ -12,6 +12,7 @@ import RegisterPage from "./components/Register/Register";
 import { AuthProvider } from "./components/Auth/Auth";
 import Productos from "./components/Productos/Productos";
 import HazTuHelado from "./components/HazTuHelado/HazTuHelado";
+import Sucursales from "./components/Sucursales/Sucursales";
 
 /*
 #FF6E72
@@ -93,6 +94,18 @@ function App() {
               </PageWithLoading>
             }
           ></Route>
+
+          {/* NUEVA RUTA: Sucursales */}
+          <Route
+            path="/sucursales"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <Sucursales />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          />
 
           {/* Página 404 */}
           <Route path="*" element={<NotFound />} />
