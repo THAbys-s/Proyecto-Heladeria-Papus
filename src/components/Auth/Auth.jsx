@@ -3,7 +3,7 @@ import axios from "axios";
 
 axios.defaults.withCredentials = true;
 
-const API_URL = "http://localhost:5000/";
+const API_URL = "http://localhost:5000";
 
 export const AuthContext = createContext();
 
@@ -20,19 +20,26 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (nombre, password) => {
     try {
-      const res = await axios.post(
-        `${API_URL}/api/login`,
-        { nombre, password },
-        { withCredentials: true }
-      );
-      if (res.status === 200) {
-        setUser({ nombre });
+      const res = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ nombre, password }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const userData = { nombre: data.user };
+        setUser(userData); // ✅ Actualiza el contexto
+        localStorage.setItem("user", JSON.stringify(userData));
         return true;
+      } else {
+        return false;
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error en login:", err);
+      return false;
     }
-    return false;
   };
 
   const logout = async () => {

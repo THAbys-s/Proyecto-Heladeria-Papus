@@ -1,7 +1,10 @@
+/* Productos.jsx */
+
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./productos.css";
 import PaypalButton from "../PaypalButton/PaypalButton.jsx";
+import ComentariosProducto from "../ComentariosProducto/ComentariosProducto.jsx";
 
 // --- ICONOS NUEVOS ---
 import {
@@ -322,6 +325,18 @@ const Productos = () => {
           </div>
         </div>
       )}
+      <section className="comentarios-section">
+        <h2>Opiniones de nuestros clientes</h2>
+        {/* 👇 Mostramos los comentarios del producto seleccionado */}
+        {productos.length > 0 ? (
+          <ComentariosProducto
+            productoId={productosVisibles[0].id} // o el primero visible, si querés
+            nombre={productosVisibles[0].nombre}
+          />
+        ) : (
+          <p className="muted">No hay productos para mostrar comentarios.</p>
+        )}
+      </section>
     </main>
   );
 };

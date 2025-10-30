@@ -1,0 +1,48 @@
+.comentarios-section {
+  margin-top: 3rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.comentarios-card {
+  border-top: 1px solid #ddd;
+  padding: 1rem 0;
+}
+
+.comentarios-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.comentarios-lista {
+  margin-bottom: 1rem;
+}
+
+.comentario-item {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.comentario-item strong {
+  color: var(--color-primary);
+}
+
+.comentario-item .fecha {
+  font-size: 0.8rem;
+  color: #777;
+  margin-left: 5px;
+}
+
+.comentario-form textarea {
+  width: 100%;
+  min-height: 60px;
+  resize: vertical;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 0.5rem;
+}
