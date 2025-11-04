@@ -1,13 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import "./navbar.css";
 
 const Navbar = () => {
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [usuario, setUsuario] = useState(null);
 
-  // Alterna visibilidad del menú en móvil
+  // 👇 Cargar usuario desde localStorage al montar
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUsuario(JSON.parse(storedUser));
+    }
+  }, []);
+
   const toggleMenu = () => setMenuAbierto((prev) => !prev);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUsuario(null);
+    window.location.reload();
+  };
 
   return (
     <nav className="navbar">
@@ -22,7 +36,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Icono menú helado móviles */}
+        {/* Icono menú móviles */}
         <button
           className="ice-cream-menu"
           aria-label="Abrir menú"
@@ -42,16 +56,10 @@ const Navbar = () => {
             >
               Principal
             </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/logotipo-heladerialospapus-removebg.png"
-                alt="Principal"
-              />
-            </div>
           </li>
           <li className="menu-item">
             <Link
-              to="/Productos"
+              to="/productos"
               className="card"
               onClick={() => setMenuAbierto(false)}
             >
@@ -66,22 +74,67 @@ const Navbar = () => {
             >
               Nosotros
             </Link>
-            <div className="dropdown">
-              <img
-                src="src/components/Navbar/imagenes/heladerialospapus-local-interior.png"
-                alt="HeladeriaLosPapus"
-              />
-            </div>
           </li>
           <li className="menu-item">
             <Link
-              to="/register"
+              to="/sucursales"
               className="card"
               onClick={() => setMenuAbierto(false)}
             >
-              Registrarse
+              Sucursales
             </Link>
           </li>
+
+          {/* 👇 Mostrar según sesión */}
+          {!usuario ? (
+            <>
+              <li className="menu-item">
+                <Link
+                  to="/register"
+                  className="card"
+                  onClick={() => setMenuAbierto(false)}
+                >
+                  Registrarse
+                </Link>
+              </li>
+              <li className="menu-item">
+                <Link
+                  to="/login"
+                  className="card"
+                  onClick={() => setMenuAbierto(false)}
+                >
+                  Iniciar sesión
+                </Link>
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="menu-item">
+                <span
+                  className="card"
+                  style={{ backgroundColor: "#fff7ba", color: "black" }}
+                >
+                  {usuario.rol === "admin"
+                    ? `Admin: ${usuario.nombre}`
+                    : usuario.nombre}
+                </span>
+              </li>
+              <li className="menu-item">
+                <button
+                  className="card"
+                  onClick={handleLogout}
+                  style={{
+                    backgroundColor: "#ff6e72",
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </nav>

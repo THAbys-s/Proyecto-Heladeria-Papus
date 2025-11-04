@@ -1,17 +1,12 @@
+# app.py
+
 from flask import Flask, url_for, render_template, request, jsonify
-
 import pymysql, os
-
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from dotenv import load_dotenv
-
 from flask_cors import CORS
-
 from functools import wraps
-
 import requests
 
 load_dotenv(".env/development.env")
@@ -23,6 +18,23 @@ PAYPAL_API_BASE = os.getenv("PAYPAL_API_BASE", "https://api-m.sandbox.paypal.com
 
 
 app = Flask(__name__)
+
+#                             #
+# FLASK LOGIN - CONFIGURACIÓN #
+#                             #
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+login_manager.login_view = None  
+login_manager.login_message = None  
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+
+
 
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -54,6 +66,56 @@ CORS(app,resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0
 #                                           #
 # RUTAS DE PRUEBA Y CONEXIÓN DB EN LA NUBE. #
 #                                           #
+
+
+
+#                                           #
+#               COMENTARIOS                 #
+#                                           #
+
+
+@app.route('/api/comentarios/<int:producto_id>', methods=['GET'])
+def obtener_comentarios(producto_id):
+    """Devuelve todos los comentarios de un producto."""
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("""
+        SELECT c.id, c.comentario, c.fecha, u.nombre AS usuario
+        FROM comentarios c
+        JOIN usuarios u ON c.usuario_id = u.id
+        WHERE c.producto_id = %s
+        ORDER BY c.fecha DESC
+    """, (producto_id,))
+    comentarios = cursor.fetchall()
+    cerrarConexion(conexion)
+    return jsonify(comentarios)
+
+
+@app.route('/api/comentarios/<int:producto_id>', methods=['POST'])
+@login_required
+def agregar_comentario(producto_id):
+    """Agrega un nuevo comentario al producto logueado."""
+    data = request.get_json()
+    texto = data.get('comentario', '').strip()
+
+    if not texto:
+        return jsonify({'error': 'Comentario vacío'}), 400
+
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute(
+        "INSERT INTO comentarios (producto_id, usuario_id, comentario) VALUES (%s, %s, %s)",
+        (producto_id, current_user.id, texto)
+    )
+    conexion.commit()
+    cerrarConexion(conexion)
+
+    return jsonify({'message': 'Comentario agregado correctamente'})
+
+
+
+
+
 
 
 #                                           #
@@ -217,6 +279,35 @@ def obtener_sabores():
     nombres = [row['nombre_sabor'] for row in res]
     return jsonify(nombres)
 
+
+# --- NUEVA RUTA: devolver tiendas (sucursales) ---
+@app.route('/api/tiendas', methods=['GET'])
+def obtener_tiendas():
+    """Devuelve todas las tiendas (tienda_id y direccion)."""
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT tienda_id, direccion FROM tiendas")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    return jsonify(res)
+
+
+# Empleados por tienda
+@app.route('/api/tiendas/<int:tienda_id>/empleados', methods=['GET'])
+def obtener_empleados_por_tienda(tienda_id):
+    """Devuelve los empleados (nombre, apellido) que trabajan en la tienda indicada."""
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    # Se asume que existe una tabla 'empleados' con columnas 'nombre', 'apellido' y 'tienda_id'
+    # En la base de datos las columnas reales son nombre_empleado y apellido_empleado
+    cursor.execute(
+        "SELECT nombre_empleado AS nombre, apellido_empleado AS apellido FROM empleados WHERE tienda_id = %s",
+        (tienda_id,)
+    )
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    return jsonify(res)
+
 # Bocadillos
 @app.route('/api/bocadillos', methods=['GET'])
 def obtener_bocadillos():
@@ -359,10 +450,13 @@ img_urls = {
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.get_json()
-    nombre = data['nombre']
-    password = data['password']
-    email = data['email']
-    rol = data.get('rol', 'usuario') 
+    nombre = data.get('nombre', '').strip()
+    email = data.get('email', '').strip()
+    password = data.get('password', '').strip()
+    rol = data.get('rol', 'usuario')
+
+    if not nombre or not email or not password:
+        return jsonify({'error': 'Todos los campos son obligatorios'}), 400
 
     if User.get_by_nombre(nombre):
         return jsonify({'error': 'Usuario ya existe'}), 400
@@ -376,8 +470,7 @@ def register():
     )
     conexion.commit()
     cerrarConexion(conexion)
-    return jsonify({'message': 'Usuario creado'}), 201
-
+    return jsonify({'message': 'Usuario creado correctamente'}), 201
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -400,11 +493,17 @@ def logout():
     logout_user()
     return jsonify({'message': 'Logged out'}), 200
 
+# @app.route('/api/protected')
+# @login_required
+# @roles_required('admin')
+# def protected():
+#     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
+
 @app.route('/api/protected')
 @login_required
-@roles_required('admin')
 def protected():
     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
+
 
 @app.route('/api/productos', methods=['GET'])
 def api_productos():
@@ -418,21 +517,6 @@ def api_productos():
         producto['img'] = img_urls.get(producto['nombre'], '')
 
     return jsonify(productos)
-
-
-#                             #
-# FLASK LOGIN - CONFIGURACIÓN #
-#                             #
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-login_manager.login_view = None  
-login_manager.login_message = None  
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
 
 
 

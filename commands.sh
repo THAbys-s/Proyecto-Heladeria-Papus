@@ -1,6 +1,3 @@
-python3 -m venv .venv
-source .venv/bin/activate
-
 npm install react-router-dom
 
 pip install flask-login
