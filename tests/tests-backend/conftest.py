@@ -1,26 +1,23 @@
+# conftest.py
 import pytest
-import importlib
 import os
 import sys
 
-# Asegurar que la raíz del proyecto (uno arriba de tests/) esté en sys.path
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+# Asegurar que la raíz del proyecto (donde está app.py) esté en sys.path
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# Importar el módulo app (app.py) como módulo para acceder a app y requests
-app_module = importlib.import_module('app')
+# Importar la app Flask desde app.py
+from app import app as flask_app
 
+@pytest.fixture(scope="session")
+def app():
+    """Configura la aplicación Flask para pruebas."""
+    flask_app.config.update(TESTING=True, SECRET_KEY="test-secret-key")
+    return flask_app
 
-@pytest.fixture
-def client():
-    app = app_module.app
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
-
-
-@pytest.fixture
-def app_module_fixture():
-    # Exponer el módulo para tests que necesiten monkeypatch sobre app.requests
-    return app_module
+@pytest.fixture()
+def client(app):
+    """Devuelve un cliente de pruebas de Flask."""
+    return app.test_client()

@@ -18,6 +18,8 @@ pip install Flask pytest pytest-cov
 
 pip install requests faker
 
+pip install pytest-mock
+
 npm install --save-dev jest babel-jest @babel/preset-env @babel/preset-react
 
 npm install --save-dev jsdom
