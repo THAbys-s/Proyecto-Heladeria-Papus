@@ -39,6 +39,6 @@ COMANDOS.md
 
 # Ignorar archivos de entorno y pruebas
 test.py
-.env
+.env/
 node_modules/
 __pycache__/

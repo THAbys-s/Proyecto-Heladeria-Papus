@@ -1,24 +1,24 @@
 npm install react-router-dom
 
-pip install flask-login
+pipenv install flask-login
 
-pip install pymysql
+pipenv install pymysql
 
 npm install axios
 
-pip install python-dotenv
+pipenv install python-dotenv
 
-pip install flask-cors
+pipenv install flask-cors
 
-pip install cryptography
+pipenv install cryptography
 
 npm install react-icons
 
-pip install Flask pytest pytest-cov
+pipenv install Flask pytest pytest-cov
 
-pip install requests faker
+pipenv install requests faker
 
-pip install pytest-mock
+pipenv install pytest-mock
 
 npm install --save-dev jest babel-jest @babel/preset-env @babel/preset-react
 
@@ -29,3 +29,4 @@ npm install --save-dev @testing-library/react @testing-library/jest-dom
 npm install --save-dev ts-jest @types/jest
 
 npm install --save-dev identity-obj-proxy
+
