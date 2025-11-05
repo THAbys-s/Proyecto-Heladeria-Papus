@@ -15,6 +15,7 @@ pytest-cov = "*"
 requests = "*"
 faker = "*"
 pytest-mock = "*"
+requests-mock = "*"
 
 [dev-packages]
 

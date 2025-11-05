@@ -159,6 +159,9 @@ def create_order():
 @app.route('/api/capture-order/<order_id>', methods=['POST'])
 def capture_order(order_id):
     auth = (PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
+    print(PAYPAL_CLIENT_ID)
+    print(PAYPAL_CLIENT_SECRET)
+
     token_response = requests.post(f"{PAYPAL_API_BASE}/v1/oauth2/token",
                                    auth=auth,
                                    data={"grant_type": "client_credentials"})
@@ -171,7 +174,7 @@ def capture_order(order_id):
             "Authorization": f"Bearer {token}"
         }
     )
-
+    print(capture_response.json())
     return jsonify(capture_response.json())
 
 
@@ -207,7 +210,8 @@ def abrirConexion():
     )
     return conexion
 
-# Cerrar la conexión
+
+
 def cerrarConexion(conexion):
     """Close the provided DB connection if it's open.
 
@@ -216,54 +220,13 @@ def cerrarConexion(conexion):
     """
     try:
         if conexion:
-            # Some pymysql versions expose an `open` attribute; double-check
             if hasattr(conexion, "open"):
                 if conexion.open:
                     conexion.close()
             else:
                 conexion.close()
     except Exception:
-        # Don't let closing errors crash the endpoint
         pass
-
-# @app.route("/mysql/test")
-# def test_mysql():
-#     conexion = abrirConexion()
-#     cursor = conexion.cursor()
-#     cursor.execute('SELECT * FROM bocadillos')
-#     resultado = cursor.fetchall()
-#     cerrarConexion()
-#     return jsonify(resultado)
-
-# @app.route('/mysql/buscar/sabores')
-# def buscar_sabores():
-#     conexion = abrirConexion()
-#     cursor = conexion.cursor()
-#     cursor.execute("SELECT nombre_sabor FROM sabores")
-#     res = cursor.fetchall()
-#     cerrarConexion()
-
-#     # Verificar la estructura de la respuesta antes de devolverla
-#     print("Sabores:", res)
-#     return jsonify(res)
-
-# @app.route('/mysql/buscar')
-# def buscar_usuario():
-#     nombre = request.args.get('nombre', '')
-#     conexion = abrirConexion()
-#     cursor = conexion.cursor()
-#     cursor.execute("SELECT nombre_sabor FROM sabores WHERE nombre_sabor LIKE %s", (f"%{nombre}%",))
-#     res = cursor.fetchall()
-#     cerrarConexion()
-
-#     # Verificar la estructura de la respuesta antes de devolverla
-#     print("Resultado búsqueda:", res)
-#     return jsonify(res)
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
-
 
 #                            #
 # RUTAS ESPECIALES DE LA API #
@@ -278,6 +241,20 @@ def obtener_sabores():
     cerrarConexion(conexion)
     nombres = [row['nombre_sabor'] for row in res]
     return jsonify(nombres)
+
+@app.route('/api/sabores/<int:id>', methods=['GET'])
+def obtener_sabor_por_id(id):
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT nombre_sabor FROM sabores WHERE sabor_id = %s", (id,))
+    res = cursor.fetchone()
+    cerrarConexion(conexion)
+    
+    if res is None:
+        return jsonify({"error": "Sabor no encontrado"}), 404
+    
+    return jsonify({"id": id, "nombre_sabor": res['nombre_sabor']})
+
 
 
 # --- NUEVA RUTA: devolver tiendas (sucursales) ---
@@ -298,8 +275,6 @@ def obtener_empleados_por_tienda(tienda_id):
     """Devuelve los empleados (nombre, apellido) que trabajan en la tienda indicada."""
     conexion = abrirConexion()
     cursor = conexion.cursor()
-    # Se asume que existe una tabla 'empleados' con columnas 'nombre', 'apellido' y 'tienda_id'
-    # En la base de datos las columnas reales son nombre_empleado y apellido_empleado
     cursor.execute(
         "SELECT nombre_empleado AS nombre, apellido_empleado AS apellido FROM empleados WHERE tienda_id = %s",
         (tienda_id,)
@@ -493,12 +468,6 @@ def logout():
     logout_user()
     return jsonify({'message': 'Logged out'}), 200
 
-# @app.route('/api/protected')
-# @login_required
-# @roles_required('admin')
-# def protected():
-#     return jsonify({'message': f'Hola {current_user.nombre}, estás logueado'})
-
 @app.route('/api/protected')
 @login_required
 def protected():
@@ -517,6 +486,19 @@ def api_productos():
         producto['img'] = img_urls.get(producto['nombre'], '')
 
     return jsonify(productos)
+
+@app.route('/api/productos/<int:id>', methods=['GET'])
+def get_producto(id):
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT * FROM productos WHERE id = %s", (id,))
+    producto = cursor.fetchone()
+    cerrarConexion(conexion)
+    
+    if producto is None:
+        return jsonify({"error": "Producto no encontrado"}), 404
+
+    return jsonify(producto)
 
 
 
