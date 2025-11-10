@@ -16,6 +16,8 @@ requests = "*"
 faker = "*"
 pytest-mock = "*"
 requests-mock = "*"
+colorama = "*"
+
 
 [dev-packages]
 
