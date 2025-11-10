@@ -27,10 +27,9 @@ def test_capture_order(client):
     capture_response = client.post(f'/api/capture-order/{order_id}')
     capture_data = capture_response.get_json()
 
-    # 1. Verificamos que la respuesta indique un error de cliente
-    # El código de estado para "lógica de negocio fallida" suele ser 400 o 422
-    # El 'if' original comprobaba 400, así que lo usamos.
-    assert capture_response.status_code == 400
+    # Verificamos que la respuesta contenga el error de PayPal
+    assert 'name' in capture_data
+    assert capture_data['name'] == 'UNPROCESSABLE_ENTITY'
 
     # 2. Verificamos que el cuerpo del error contenga los detalles
     assert 'details' in capture_data
