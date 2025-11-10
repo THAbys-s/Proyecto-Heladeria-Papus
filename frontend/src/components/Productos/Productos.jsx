@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./productos.css";
-import PaypalButton from "../PaypalButton/PaypalButton.jsx";
+import Carrito from "../Carrito/Carrito.jsx";
 import ComentariosProducto from "../ComentariosProducto/ComentariosProducto.jsx";
 
 // --- ICONOS NUEVOS ---

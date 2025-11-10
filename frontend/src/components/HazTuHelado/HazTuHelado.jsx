@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./haztuhelado.css";
-import PaypalButton from "../PaypalButton/PaypalButton.jsx";
+import Carrito from "../Carrito/Carrito.jsx";
 
 const HazTuHelado = () => {
   const [sabores, setSabores] = useState([]);
