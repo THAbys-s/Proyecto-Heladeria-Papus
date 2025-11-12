@@ -303,6 +303,17 @@ def obtener_empleados_por_tienda(tienda_id):
     return jsonify(res)
 
 
+@app.route('/api/usuarios', methods=['GET'])
+def obtener_usuarios():
+    """Devuelve una lista de usuarios (id, nombre, email, access)"""
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id, nombre, email, access FROM usuarios ORDER BY id")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    return jsonify(res)
+
+
 # Endpoint para recibir solicitudes de empleo
 @app.route('/api/solicitudes-empleo', methods=['POST'])
 def crear_solicitud_empleo():
