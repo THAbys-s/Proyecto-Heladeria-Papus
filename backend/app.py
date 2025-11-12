@@ -302,6 +302,53 @@ def obtener_empleados_por_tienda(tienda_id):
     cerrarConexion(conexion)
     return jsonify(res)
 
+
+# Endpoint para recibir solicitudes de empleo
+@app.route('/api/solicitudes-empleo', methods=['POST'])
+def crear_solicitud_empleo():
+    """Recibe datos de formulario de empleo e inserta en la tabla solicitudes_empleo."""
+    data = request.get_json() or {}
+    nombre = (data.get('nombre') or '').strip()
+    apellido = (data.get('apellido') or '').strip()
+    email = (data.get('email') or '').strip()
+    telefono = (data.get('telefono') or '').strip()
+    puesto = (data.get('puesto_deseado') or '').strip()
+    experiencia = (data.get('experiencia') or '').strip()
+    mensaje = (data.get('mensaje') or '').strip()
+    cv_url = (data.get('cv_url') or '').strip()
+
+    # Validaciones básicas
+    if not nombre or not apellido or not email:
+        return jsonify({'error': 'nombre, apellido y email son requeridos'}), 400
+
+    # Insertar en la base de datos
+    try:
+        conexion = abrirConexion()
+        cursor = conexion.cursor()
+        cursor.execute(
+            """
+            INSERT INTO solicitudes_empleo (nombre, apellido, email, telefono, puesto_deseado, experiencia, mensaje, cv_url, fecha_envio)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """,
+            (nombre, apellido, email, telefono, puesto, experiencia, mensaje, cv_url)
+        )
+        conexion.commit()
+        new_id = cursor.lastrowid
+    except Exception as e:
+        # Log minimal y devolver 500
+        try:
+            cerrarConexion(conexion)
+        except Exception:
+            pass
+        return jsonify({'error': 'Error al guardar la solicitud', 'detail': str(e)}), 500
+    finally:
+        try:
+            cerrarConexion(conexion)
+        except Exception:
+            pass
+
+    return jsonify({'message': 'Solicitud enviada correctamente', 'id': new_id}), 201
+
 # Bocadillos
 @app.route('/api/bocadillos', methods=['GET'])
 def obtener_bocadillos():
