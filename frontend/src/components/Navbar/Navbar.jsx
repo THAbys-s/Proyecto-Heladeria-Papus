@@ -1,27 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import "./navbar.css";
+import { AuthContext } from "../Auth/Auth.jsx";
 
 const Navbar = () => {
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const [usuario, setUsuario] = useState(null);
+  const { user, logout } = useContext(AuthContext);
 
-  // 👇 Cargar usuario desde localStorage al montar
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUsuario(JSON.parse(storedUser));
-    }
-  }, []);
-
+  // Alterna visibilidad del menú en móvil
   const toggleMenu = () => setMenuAbierto((prev) => !prev);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUsuario(null);
-    window.location.reload();
-  };
 
   return (
     <nav className="navbar">
@@ -36,7 +24,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Icono menú móviles */}
+        {/* Icono menú helado móviles */}
         <button
           className="ice-cream-menu"
           aria-label="Abrir menú"
@@ -56,10 +44,16 @@ const Navbar = () => {
             >
               Principal
             </Link>
+            <div className="dropdown">
+              <img
+                src="src/components/Navbar/imagenes/logotipo-heladerialospapus-removebg.png"
+                alt="Principal"
+              />
+            </div>
           </li>
           <li className="menu-item">
             <Link
-              to="/productos"
+              to="/Productos"
               className="card"
               onClick={() => setMenuAbierto(false)}
             >
@@ -74,6 +68,12 @@ const Navbar = () => {
             >
               Nosotros
             </Link>
+            <div className="dropdown">
+              <img
+                src="src/components/Navbar/imagenes/heladerialospapus-local-interior.png"
+                alt="HeladeriaLosPapus"
+              />
+            </div>
           </li>
           <li className="menu-item">
             <Link
@@ -84,9 +84,34 @@ const Navbar = () => {
               Sucursales
             </Link>
           </li>
-
-          {/* 👇 Mostrar según sesión */}
-          {!usuario ? (
+          {user ? (
+            <li className="menu-item">
+              <div
+                className="card"
+                style={{ background: "#ffa9ac", color: "white" }}
+              >
+                {user.nombre}
+                <button
+                  onClick={() => {
+                    logout();
+                    setMenuAbierto(false);
+                  }}
+                  className="logout-btn"
+                  style={{
+                    marginLeft: "10px",
+                    background: "#ff6e72",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "4px 10px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            </li>
+          ) : (
             <>
               <li className="menu-item">
                 <Link
@@ -105,33 +130,6 @@ const Navbar = () => {
                 >
                   Iniciar sesión
                 </Link>
-              </li>
-            </>
-          ) : (
-            <>
-              <li className="menu-item">
-                <span
-                  className="card"
-                  style={{ backgroundColor: "#fff7ba", color: "black" }}
-                >
-                  {usuario.rol === "admin"
-                    ? `Admin: ${usuario.nombre}`
-                    : usuario.nombre}
-                </span>
-              </li>
-              <li className="menu-item">
-                <button
-                  className="card"
-                  onClick={handleLogout}
-                  style={{
-                    backgroundColor: "#ff6e72",
-                    color: "white",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cerrar sesión
-                </button>
               </li>
             </>
           )}

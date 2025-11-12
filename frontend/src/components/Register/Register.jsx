@@ -75,20 +75,6 @@ const RegisterPage = () => {
           <label htmlFor="password">Contraseña</label>
         </div>
 
-        {/* 👇 Nuevo campo select para el rol */}
-        <div className="form-item">
-          <select
-            id="rol"
-            value={rol}
-            onChange={(e) => setRol(e.target.value)}
-            required
-          >
-            <option value="usuario">Usuario</option>
-            <option value="admin">Admin</option>
-          </select>
-          <label htmlFor="rol">Tipo de cuenta</label>
-        </div>
-
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         <div className="boton">

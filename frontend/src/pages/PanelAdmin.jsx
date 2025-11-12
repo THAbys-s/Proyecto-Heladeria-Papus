@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import { AuthContext } from "./auth/Auth";
+import { AuthContext } from "../components/Auth/Auth";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/";
 
-const AdminPage = () => {
+const PanelAdmin = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
@@ -98,4 +98,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default PanelAdmin;
