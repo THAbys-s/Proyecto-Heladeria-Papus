@@ -19,6 +19,7 @@ const PayPalButton = ({
       // limpiar cualquier botón previo para evitar duplicados
       containerRef.current.innerHTML = "";
       try {
+        if (!window.paypal) throw new Error("window.paypal is not available");
         window.paypal
           .Buttons({
             createOrder: async () => {

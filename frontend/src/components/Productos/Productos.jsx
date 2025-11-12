@@ -194,10 +194,16 @@ const Productos = () => {
                   <h3>{producto.nombre}</h3>
                   <div className="producto-precio">
                     <span className="precio-original">
-                      ${producto.precioOriginal.toLocaleString()}
+                      $
+                      {producto.precioOriginal != null
+                        ? Number(producto.precioOriginal).toLocaleString()
+                        : "0"}
                     </span>
                     <span className="precio-descuento">
-                      ${producto.precio.toLocaleString()}
+                      $
+                      {producto.precio != null
+                        ? Number(producto.precio).toLocaleString()
+                        : "0"}
                     </span>
                     <span className="descuento">-{producto.descuento}%</span>
                   </div>

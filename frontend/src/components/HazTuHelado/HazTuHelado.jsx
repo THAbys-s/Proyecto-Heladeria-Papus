@@ -152,10 +152,14 @@ const HazTuHelado = () => {
   const confirmarHelado = () => {
     const helado = {
       cucurucho: selectedCucurucho,
-      sabores: [...selectedSabores, ...selectedEspeciales],
+      sabores:
+        Array.isArray(selectedSabores) || Array.isArray(selectedEspeciales)
+          ? [...selectedSabores, ...selectedEspeciales]
+          : [],
       bocadillo: selectedBocadillo,
       salsa: selectedSalsa,
       cantidad: 1,
+      precio: 0,
       id: Date.now(),
     };
     setCarrito((prev) => [...prev, helado]);
@@ -451,7 +455,9 @@ const HazTuHelado = () => {
                       <div>
                         <div style={{ fontWeight: 700 }}>{item.cucurucho}</div>
                         <div style={{ fontSize: ".9rem" }}>
-                          {item.sabores.join(", ")}
+                          {Array.isArray(item.sabores)
+                            ? item.sabores.join(", ")
+                            : String(item.sabores || "")}
                         </div>
                       </div>
                       <div>
