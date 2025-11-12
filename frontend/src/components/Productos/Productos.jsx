@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./productos.css";
 import Carrito from "../Carrito/Carrito.jsx";
 import ComentariosProducto from "../ComentariosProducto/ComentariosProducto.jsx";
+import PaypalButton from "../PaypalButton/PaypalButton.jsx";
 
 // --- ICONOS NUEVOS ---
 import {
