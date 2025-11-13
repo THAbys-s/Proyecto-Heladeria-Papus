@@ -197,18 +197,20 @@ def capture_order(order_id):
     # Intentamos guardar información del pago y del helado creado si el cliente envió datos
     try:
         data = request.get_json(silent=True) or {}
-        helado = data.get('helado')  # objeto con cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario
+        # support both single helado or array helados
+        helado = data.get('helado')
+        helados = data.get('helados') or ( [helado] if helado else None )
         tienda_id = data.get('tienda_id')
         empleado_id = data.get('empleado_id')
 
-        # Sólo guardamos si la captura fue exitosa (estado COMPLETED) y se proveyó la información del helado
+        # Sólo guardamos si la captura fue exitosa (estado COMPLETED) y se proveyó la información del helado(s)
         status = None
         try:
             status = capture_json.get('status') or (capture_json.get('status') if isinstance(capture_json, dict) else None)
         except Exception:
             status = None
 
-        if helado and (not status or str(status).upper() == 'COMPLETED' or 'captures' in str(capture_json)):
+        if helados and (not status or str(status).upper() == 'COMPLETED' or 'captures' in str(capture_json)):
             # obtener monto si está disponible en la respuesta de PayPal
             monto = None
             try:
@@ -233,36 +235,94 @@ def capture_order(order_id):
                     conexion.commit()
                     pago_id = cursor.lastrowid
 
-                # Insertar en helados_creados
-                # Campos de la tabla: fecha_creacion, pedido_id, pago_id, cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario
-                cursor.execute(
-                    "INSERT INTO helados_creados (fecha_creacion, pedido_id, pago_id, cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario) VALUES (NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    (
-                        order_id,
-                        pago_id,
-                        helado.get('cucurucho_id'),
-                        helado.get('sabor_id'),
-                        helado.get('especial_id'),
-                        helado.get('salsa_id'),
-                        helado.get('bocadillo_id'),
-                        helado.get('cantidad') or 1,
-                        helado.get('comentario')
-                    )
-                )
-                conexion.commit()
+                # helper: resolver nombre a id en tablas relevantes
+                def resolve_id(table, id_col, name_col, value):
+                    try:
+                        if value is None:
+                            return None
+                        # si ya es entero, devolverlo
+                        if isinstance(value, int):
+                            return value
+                        cursor.execute(f"SELECT {id_col} FROM {table} WHERE {name_col} = %s", (value,))
+                        r = cursor.fetchone()
+                        return r[id_col] if r else None
+                    except Exception:
+                        return None
+
+                # Iterar helados y guardar uno por fila
+                for h in helados:
+                    try:
+                        # h puede contener nombres (strings) o ids; normalizamos
+                        cucurucho_val = h.get('cucurucho') or h.get('cucurucho_id') or h.get('cucurucho_name')
+                        sabor_val = None
+                        # soportar array de sabores -> tomar primero
+                        if isinstance(h.get('sabores'), list) and len(h.get('sabores')) > 0:
+                            sabor_val = h.get('sabores')[0]
+                        else:
+                            sabor_val = h.get('sabor') or h.get('sabor_id') or h.get('sabor_name')
+                        especial_val = h.get('especial') or h.get('especial_id') or h.get('especial_name')
+                        salsa_val = h.get('salsa') or h.get('salsa_id') or h.get('salsa_name')
+                        bocadillo_val = h.get('bocadillo') or h.get('bocadillo_id') or h.get('bocadillo_name')
+                        cantidad = int(h.get('cantidad') or 1)
+                        comentario = h.get('comentario')
+
+                        cucurucho_id = resolve_id('cucuruchos', 'cucurucho_id', 'nombre_cucurucho', cucurucho_val)
+                        sabor_id = resolve_id('sabores', 'sabor_id', 'nombre_sabor', sabor_val)
+                        especial_id = resolve_id('especiales', 'especial_id', 'nombre_especial', especial_val)
+                        salsa_id = resolve_id('salsas', 'salsa_id', 'nombre_salsa', salsa_val)
+                        bocadillo_id = resolve_id('bocadillos', 'bocadillo_id', 'nombre_bocadillo', bocadillo_val)
+
+                        # pedido_id column appears to be integer in the DB schema.
+                        # PayPal order IDs are strings (e.g. '5L362129EV8448721'),
+                        # which causes a "Data truncated for column 'pedido_id'" error.
+                        # Para evitarlo: si order_id no es numérico guardamos NULL en pedido_id
+                        # y añadimos la referencia de PayPal al campo comentario.
+                        try:
+                            pedido_id_val = int(order_id)
+                        except Exception:
+                            pedido_id_val = None
+
+                        final_comentario = comentario or ""
+                        # Añadir la referencia a PayPal para seguimiento
+                        try:
+                            if order_id:
+                                final_comentario = (final_comentario + " ").strip() + f" (paypal_order: {order_id})"
+                        except Exception:
+                            pass
+
+                        cursor.execute(
+                            "INSERT INTO helados_creados (fecha_creacion, pedido_id, pago_id, cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario) VALUES (NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                            (
+                                pedido_id_val,
+                                pago_id,
+                                cucurucho_id,
+                                sabor_id,
+                                especial_id,
+                                salsa_id,
+                                bocadillo_id,
+                                cantidad,
+                                final_comentario,
+                            )
+                        )
+                        conexion.commit()
+                    except Exception as e:
+                        try:
+                            conexion.rollback()
+                        except Exception:
+                            pass
+                        print("Error al insertar helado individual:", e)
             except Exception as e:
                 # Si falla la inserción, hacer rollback y continuar (no bloquear la respuesta a PayPal)
                 try:
                     conexion.rollback()
                 except Exception:
                     pass
-                print("Error al insertar helado/pago:", e)
+                print("Error al insertar helado(s)/pago:", e)
             finally:
                 try:
                     cerrarConexion(conexion)
                 except Exception:
                     pass
-
     except Exception as e:
         # No queremos que un error de guardado impida responder a PayPal
         print("Error procesando datos adicionales tras captura:", e)
