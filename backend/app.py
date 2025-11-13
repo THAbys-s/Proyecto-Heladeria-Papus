@@ -193,8 +193,81 @@ def capture_order(order_id):
             "Authorization": f"Bearer {token}"
         }
     )
-    print(capture_response.json())
-    return jsonify(capture_response.json())
+    capture_json = capture_response.json()
+    # Intentamos guardar información del pago y del helado creado si el cliente envió datos
+    try:
+        data = request.get_json(silent=True) or {}
+        helado = data.get('helado')  # objeto con cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario
+        tienda_id = data.get('tienda_id')
+        empleado_id = data.get('empleado_id')
+
+        # Sólo guardamos si la captura fue exitosa (estado COMPLETED) y se proveyó la información del helado
+        status = None
+        try:
+            status = capture_json.get('status') or (capture_json.get('status') if isinstance(capture_json, dict) else None)
+        except Exception:
+            status = None
+
+        if helado and (not status or str(status).upper() == 'COMPLETED' or 'captures' in str(capture_json)):
+            # obtener monto si está disponible en la respuesta de PayPal
+            monto = None
+            try:
+                # estructura típica: purchase_units -> payments -> captures -> amount -> value
+                pu = capture_json.get('purchase_units') or []
+                if pu and isinstance(pu, list):
+                    amt = pu[0].get('payments', {}).get('captures', [{}])[0].get('amount', {})
+                    monto = float(amt.get('value')) if amt and amt.get('value') is not None else None
+            except Exception:
+                monto = None
+
+            conexion = abrirConexion()
+            cursor = conexion.cursor()
+            try:
+                # Insertar en pagos (si se proporciona monto y/o tienda/empleado)
+                pago_id = None
+                if monto is not None or tienda_id is not None or empleado_id is not None:
+                    cursor.execute(
+                        "INSERT INTO pagos (monto, tienda_id, empleado_id) VALUES (%s, %s, %s)",
+                        (monto or 0, tienda_id, empleado_id)
+                    )
+                    conexion.commit()
+                    pago_id = cursor.lastrowid
+
+                # Insertar en helados_creados
+                # Campos de la tabla: fecha_creacion, pedido_id, pago_id, cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario
+                cursor.execute(
+                    "INSERT INTO helados_creados (fecha_creacion, pedido_id, pago_id, cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario) VALUES (NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        order_id,
+                        pago_id,
+                        helado.get('cucurucho_id'),
+                        helado.get('sabor_id'),
+                        helado.get('especial_id'),
+                        helado.get('salsa_id'),
+                        helado.get('bocadillo_id'),
+                        helado.get('cantidad') or 1,
+                        helado.get('comentario')
+                    )
+                )
+                conexion.commit()
+            except Exception as e:
+                # Si falla la inserción, hacer rollback y continuar (no bloquear la respuesta a PayPal)
+                try:
+                    conexion.rollback()
+                except Exception:
+                    pass
+                print("Error al insertar helado/pago:", e)
+            finally:
+                try:
+                    cerrarConexion(conexion)
+                except Exception:
+                    pass
+
+    except Exception as e:
+        # No queremos que un error de guardado impida responder a PayPal
+        print("Error procesando datos adicionales tras captura:", e)
+
+    return jsonify(capture_json)
 
 
 @app.route('/api/paypal-client-id', methods=['GET'])
