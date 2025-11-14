@@ -19,7 +19,6 @@ pytest-mock = "*"
 requests-mock = "*"
 colorama = "*"
 
-
 [dev-packages]
 
 [requires]

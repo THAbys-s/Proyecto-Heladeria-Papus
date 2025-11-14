@@ -55,8 +55,12 @@ const imgUrls = {
 const Productos = () => {
   const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState(() => {
-    const savedCart = localStorage.getItem("carrito");
-    return savedCart ? JSON.parse(savedCart) : [];
+    try {
+      const saved = JSON.parse(localStorage.getItem("carrito"));
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
   });
   const [paginaActual, setPaginaActual] = useState(1);
   const productosPorPagina = 6;

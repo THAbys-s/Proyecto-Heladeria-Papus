@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         const data = await res.json();
         const userData = { nombre: data.user };
-        setUser(userData); // ✅ Actualiza el contexto
+        setUser(userData); // Actualiza el contexto
         localStorage.setItem("user", JSON.stringify(userData));
         return true;
       } else {
