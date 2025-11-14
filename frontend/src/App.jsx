@@ -13,7 +13,11 @@ import { AuthProvider } from "./components/Auth/Auth";
 import Productos from "./components/Productos/Productos";
 import HazTuHelado from "./components/HazTuHelado/HazTuHelado";
 import Sucursales from "./components/Sucursales/Sucursales";
+<<<<<<< HEAD
+import PanelAdmin from "./pages/PanelAdmin";
+=======
 import FormularioEmpleo from "./components/FormularioEmpleo/FormularioEmpleo";
+>>>>>>> Diego
 
 /*
 #FF6E72
@@ -103,6 +107,17 @@ function App() {
               <PageWithLoading>
                 <MainLayout>
                   <Sucursales />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <PanelAdmin />
                 </MainLayout>
               </PageWithLoading>
             }
