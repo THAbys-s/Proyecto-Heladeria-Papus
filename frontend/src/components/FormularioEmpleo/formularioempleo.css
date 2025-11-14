@@ -1,0 +1,60 @@
+.form-empleo-container {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.form-empleo h2 {
+  margin-top: 0;
+}
+.form-empleo label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: black;
+}
+.form-empleo input,
+.form-empleo textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+.form-empleo textarea {
+  min-height: 100px;
+}
+.form-empleo .row {
+  display: flex;
+  gap: 12px;
+}
+.form-empleo .row label {
+  flex: 1;
+}
+.form-empleo .actions {
+  text-align: right;
+  margin-top: 12px;
+}
+.form-empleo button {
+  background: #65b7da;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.form-empleo .status {
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 4px;
+}
+.form-empleo .status.success {
+  background: #e6ffef;
+  color: #046b2c;
+}
+.form-empleo .status.error {
+  background: #ffecec;
+  color: #7a1f1f;
+}

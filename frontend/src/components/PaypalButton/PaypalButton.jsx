@@ -5,6 +5,9 @@ const PayPalButton = ({
   currency = "USD",
   description,
   onSuccess,
+  helado, // opcional: objeto con cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario
+  tienda_id, // opcional
+  empleado_id, // opcional
 }) => {
   const containerRef = useRef(null);
   const scriptRef = useRef(null);
@@ -19,6 +22,7 @@ const PayPalButton = ({
       // limpiar cualquier botón previo para evitar duplicados
       containerRef.current.innerHTML = "";
       try {
+        if (!window.paypal) throw new Error("window.paypal is not available");
         window.paypal
           .Buttons({
             createOrder: async () => {
@@ -31,10 +35,17 @@ const PayPalButton = ({
               return data.id || data.orderID || data.orderId;
             },
             onApprove: async (data) => {
+              const body = helado
+                ? { helado, tienda_id, empleado_id }
+                : undefined;
               const res = await fetch(
                 `/api/capture-order/${data.orderID || data.orderId}`,
                 {
                   method: "POST",
+                  headers: body
+                    ? { "Content-Type": "application/json" }
+                    : undefined,
+                  body: body ? JSON.stringify(body) : undefined,
                 }
               );
               const details = await res.json();

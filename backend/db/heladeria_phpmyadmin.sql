@@ -52,6 +52,30 @@ CREATE TABLE productos (
     descuento INT NOT NULL
 );
 
+-- Tabla para persistir el carrito (opcional: usada por el backend)
+CREATE TABLE carrito (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    producto_id INT,
+    cantidad INT NOT NULL DEFAULT 1,
+    precio DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    nombre VARCHAR(255),
+    fecha DATETIME,
+    FOREIGN KEY (producto_id) REFERENCES productos(id)
+);
+
+CREATE TABLE solicitudes_empleo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    telefono VARCHAR(30),
+    puesto_deseado VARCHAR(100),
+    experiencia TEXT,
+    mensaje TEXT,
+    cv_url VARCHAR(255),
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE pagos (
     pago_id INT AUTO_INCREMENT PRIMARY KEY,
     monto DECIMAL(10,2) NOT NULL,

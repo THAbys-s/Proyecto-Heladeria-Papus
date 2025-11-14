@@ -15,3 +15,5 @@ pipenv install requests-mock
 pipenv install requests faker
 
 pipenv install pytest-mock
+
+pipenv install colorama

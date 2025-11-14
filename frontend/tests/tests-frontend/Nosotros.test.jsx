@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+<<<<<<< HEAD
 import { render, screen, within } from "@testing-library/react";
 import Nosotros from "../../src/components/Nosotros/Nosotros.jsx";
 
@@ -129,5 +130,25 @@ describe("Componente <Nosotros />", () => {
       const paragraphs = document.querySelectorAll("p");
       expect(paragraphs.length).toBeGreaterThanOrEqual(headings.length - 1);
     });
+=======
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import Nosotros from "../../src/components/Nosotros/Nosotros.jsx";
+
+describe("Nosotros component - mapa", () => {
+  it("renderiza un iframe con el mapa de Google", async () => {
+    render(
+      <MemoryRouter>
+        <Nosotros />
+      </MemoryRouter>
+    );
+
+    const iframe = screen.getByTitle(/Ubicación Heladería Los Papus/i);
+    expect(iframe).toBeInTheDocument();
+    expect(iframe).toHaveAttribute(
+      "src",
+      expect.stringContaining("google.com/maps")
+    );
+>>>>>>> Diego
   });
 });

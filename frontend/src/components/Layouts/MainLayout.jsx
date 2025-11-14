@@ -52,6 +52,11 @@ const MainLayout = ({ children }) => {
         <p>Teléfono de Contacto: +54 9 11 3857-2025</p>
         <p> Correo: ajataledezmadiego@gmail.com</p>
         <p>
+          <a href="/formulario-solicitud-empleo">
+            Trabajá con nosotros: enviar solicitud de empleo
+          </a>
+        </p>
+        <p>
           Seguinos en Instagram para enterarte de nuestras novedades y ofertas:
         </p>
         <a

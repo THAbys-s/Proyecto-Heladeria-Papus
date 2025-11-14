@@ -1,6 +1,6 @@
 # test_bocadillos.py
 import app
-def test_get_bocadillos_ok(client, mocker):
+def test_get_bocadillos_ok(client):
     res = client.get("/api/bocadillos")
     assert res.status_code == 200
     data = res.get_json()

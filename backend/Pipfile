@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 flask-login = "*"
+playwright = "*"
 pymysql = "*"
 python-dotenv = "*"
 flask-cors = "*"
@@ -16,6 +17,8 @@ requests = "*"
 faker = "*"
 pytest-mock = "*"
 requests-mock = "*"
+colorama = "*"
+
 
 [dev-packages]
 

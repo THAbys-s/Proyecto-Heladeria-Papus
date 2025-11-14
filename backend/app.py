@@ -87,6 +87,15 @@ def obtener_comentarios(producto_id):
         ORDER BY c.fecha DESC
     """, (producto_id,))
     comentarios = cursor.fetchall()
+    # Formatear la fecha como cadena para que los tests reciban: 'YYYY-MM-DD HH:MM:SS'
+    for c in comentarios:
+        f = c.get('fecha')
+        try:
+            if f is not None:
+                c['fecha'] = f.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception:
+            # si ya es string o no puede formatearse, dejar como está
+            pass
     cerrarConexion(conexion)
     return jsonify(comentarios)
 
@@ -101,10 +110,20 @@ def agregar_comentario(producto_id):
     if not texto:
         return jsonify({'error': 'Comentario vacío'}), 400
 
+    if len(texto) > 500:
+        return jsonify({'error': 'Se supera el límite de caracteres del comentario'}), 400
+
+    # Verificar que el producto exista
     conexion = abrirConexion()
     cursor = conexion.cursor()
+    cursor.execute("SELECT id FROM productos WHERE id = %s", (producto_id,))
+    prod = cursor.fetchone()
+    if not prod:
+        cerrarConexion(conexion)
+        return jsonify({'error': 'El producto no existe'}), 404
+
     cursor.execute(
-        "INSERT INTO comentarios (producto_id, usuario_id, comentario) VALUES (%s, %s, %s)",
+        "INSERT INTO comentarios (producto_id, usuario_id, comentario, fecha) VALUES (%s, %s, %s, NOW())",
         (producto_id, current_user.id, texto)
     )
     conexion.commit()
@@ -174,8 +193,141 @@ def capture_order(order_id):
             "Authorization": f"Bearer {token}"
         }
     )
-    print(capture_response.json())
-    return jsonify(capture_response.json())
+    capture_json = capture_response.json()
+    # Intentamos guardar información del pago y del helado creado si el cliente envió datos
+    try:
+        data = request.get_json(silent=True) or {}
+        # support both single helado or array helados
+        helado = data.get('helado')
+        helados = data.get('helados') or ( [helado] if helado else None )
+        tienda_id = data.get('tienda_id')
+        empleado_id = data.get('empleado_id')
+
+        # Sólo guardamos si la captura fue exitosa (estado COMPLETED) y se proveyó la información del helado(s)
+        status = None
+        try:
+            status = capture_json.get('status') or (capture_json.get('status') if isinstance(capture_json, dict) else None)
+        except Exception:
+            status = None
+
+        if helados and (not status or str(status).upper() == 'COMPLETED' or 'captures' in str(capture_json)):
+            # obtener monto si está disponible en la respuesta de PayPal
+            monto = None
+            try:
+                # estructura típica: purchase_units -> payments -> captures -> amount -> value
+                pu = capture_json.get('purchase_units') or []
+                if pu and isinstance(pu, list):
+                    amt = pu[0].get('payments', {}).get('captures', [{}])[0].get('amount', {})
+                    monto = float(amt.get('value')) if amt and amt.get('value') is not None else None
+            except Exception:
+                monto = None
+
+            conexion = abrirConexion()
+            cursor = conexion.cursor()
+            try:
+                # Insertar en pagos (si se proporciona monto y/o tienda/empleado)
+                pago_id = None
+                if monto is not None or tienda_id is not None or empleado_id is not None:
+                    cursor.execute(
+                        "INSERT INTO pagos (monto, tienda_id, empleado_id) VALUES (%s, %s, %s)",
+                        (monto or 0, tienda_id, empleado_id)
+                    )
+                    conexion.commit()
+                    pago_id = cursor.lastrowid
+
+                # helper: resolver nombre a id en tablas relevantes
+                def resolve_id(table, id_col, name_col, value):
+                    try:
+                        if value is None:
+                            return None
+                        # si ya es entero, devolverlo
+                        if isinstance(value, int):
+                            return value
+                        cursor.execute(f"SELECT {id_col} FROM {table} WHERE {name_col} = %s", (value,))
+                        r = cursor.fetchone()
+                        return r[id_col] if r else None
+                    except Exception:
+                        return None
+
+                # Iterar helados y guardar uno por fila
+                for h in helados:
+                    try:
+                        # h puede contener nombres (strings) o ids; normalizamos
+                        cucurucho_val = h.get('cucurucho') or h.get('cucurucho_id') or h.get('cucurucho_name')
+                        sabor_val = None
+                        # soportar array de sabores -> tomar primero
+                        if isinstance(h.get('sabores'), list) and len(h.get('sabores')) > 0:
+                            sabor_val = h.get('sabores')[0]
+                        else:
+                            sabor_val = h.get('sabor') or h.get('sabor_id') or h.get('sabor_name')
+                        especial_val = h.get('especial') or h.get('especial_id') or h.get('especial_name')
+                        salsa_val = h.get('salsa') or h.get('salsa_id') or h.get('salsa_name')
+                        bocadillo_val = h.get('bocadillo') or h.get('bocadillo_id') or h.get('bocadillo_name')
+                        cantidad = int(h.get('cantidad') or 1)
+                        comentario = h.get('comentario')
+
+                        cucurucho_id = resolve_id('cucuruchos', 'cucurucho_id', 'nombre_cucurucho', cucurucho_val)
+                        sabor_id = resolve_id('sabores', 'sabor_id', 'nombre_sabor', sabor_val)
+                        especial_id = resolve_id('especiales', 'especial_id', 'nombre_especial', especial_val)
+                        salsa_id = resolve_id('salsas', 'salsa_id', 'nombre_salsa', salsa_val)
+                        bocadillo_id = resolve_id('bocadillos', 'bocadillo_id', 'nombre_bocadillo', bocadillo_val)
+
+                        # pedido_id column appears to be integer in the DB schema.
+                        # PayPal order IDs are strings (e.g. '5L362129EV8448721'),
+                        # which causes a "Data truncated for column 'pedido_id'" error.
+                        # Para evitarlo: si order_id no es numérico guardamos NULL en pedido_id
+                        # y añadimos la referencia de PayPal al campo comentario.
+                        try:
+                            pedido_id_val = int(order_id)
+                        except Exception:
+                            pedido_id_val = None
+
+                        final_comentario = comentario or ""
+                        # Añadir la referencia a PayPal para seguimiento
+                        try:
+                            if order_id:
+                                final_comentario = (final_comentario + " ").strip() + f" (paypal_order: {order_id})"
+                        except Exception:
+                            pass
+
+                        cursor.execute(
+                            "INSERT INTO helados_creados (fecha_creacion, pedido_id, pago_id, cucurucho_id, sabor_id, especial_id, salsa_id, bocadillo_id, cantidad, comentario) VALUES (NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                            (
+                                pedido_id_val,
+                                pago_id,
+                                cucurucho_id,
+                                sabor_id,
+                                especial_id,
+                                salsa_id,
+                                bocadillo_id,
+                                cantidad,
+                                final_comentario,
+                            )
+                        )
+                        conexion.commit()
+                    except Exception as e:
+                        try:
+                            conexion.rollback()
+                        except Exception:
+                            pass
+                        print("Error al insertar helado individual:", e)
+            except Exception as e:
+                # Si falla la inserción, hacer rollback y continuar (no bloquear la respuesta a PayPal)
+                try:
+                    conexion.rollback()
+                except Exception:
+                    pass
+                print("Error al insertar helado(s)/pago:", e)
+            finally:
+                try:
+                    cerrarConexion(conexion)
+                except Exception:
+                    pass
+    except Exception as e:
+        # No queremos que un error de guardado impida responder a PayPal
+        print("Error procesando datos adicionales tras captura:", e)
+
+    return jsonify(capture_json)
 
 
 @app.route('/api/paypal-client-id', methods=['GET'])
@@ -282,6 +434,64 @@ def obtener_empleados_por_tienda(tienda_id):
     res = cursor.fetchall()
     cerrarConexion(conexion)
     return jsonify(res)
+
+
+@app.route('/api/usuarios', methods=['GET'])
+def obtener_usuarios():
+    """Devuelve una lista de usuarios (id, nombre, email, access)"""
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id, nombre, email, access FROM usuarios ORDER BY id")
+    res = cursor.fetchall()
+    cerrarConexion(conexion)
+    return jsonify(res)
+
+
+# Endpoint para recibir solicitudes de empleo
+@app.route('/api/solicitudes-empleo', methods=['POST'])
+def crear_solicitud_empleo():
+    """Recibe datos de formulario de empleo e inserta en la tabla solicitudes_empleo."""
+    data = request.get_json() or {}
+    nombre = (data.get('nombre') or '').strip()
+    apellido = (data.get('apellido') or '').strip()
+    email = (data.get('email') or '').strip()
+    telefono = (data.get('telefono') or '').strip()
+    puesto = (data.get('puesto_deseado') or '').strip()
+    experiencia = (data.get('experiencia') or '').strip()
+    mensaje = (data.get('mensaje') or '').strip()
+    cv_url = (data.get('cv_url') or '').strip()
+
+    # Validaciones básicas
+    if not nombre or not apellido or not email:
+        return jsonify({'error': 'nombre, apellido y email son requeridos'}), 400
+
+    # Insertar en la base de datos
+    try:
+        conexion = abrirConexion()
+        cursor = conexion.cursor()
+        cursor.execute(
+            """
+            INSERT INTO solicitudes_empleo (nombre, apellido, email, telefono, puesto_deseado, experiencia, mensaje, cv_url, fecha_envio)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """,
+            (nombre, apellido, email, telefono, puesto, experiencia, mensaje, cv_url)
+        )
+        conexion.commit()
+        new_id = cursor.lastrowid
+    except Exception as e:
+        # Log minimal y devolver 500
+        try:
+            cerrarConexion(conexion)
+        except Exception:
+            pass
+        return jsonify({'error': 'Error al guardar la solicitud', 'detail': str(e)}), 500
+    finally:
+        try:
+            cerrarConexion(conexion)
+        except Exception:
+            pass
+
+    return jsonify({'message': 'Solicitud enviada correctamente', 'id': new_id}), 201
 
 # Bocadillos
 @app.route('/api/bocadillos', methods=['GET'])
@@ -391,6 +601,22 @@ class User(UserMixin):
             )
         return None
 
+    @staticmethod
+    def get_by_email(email):
+        conexion = abrirConexion()
+        cursor = conexion.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
+        result = cursor.fetchone()
+        cerrarConexion(conexion)
+        if result:
+            return User(
+                result['id'],
+                result['nombre'],
+                result['password'],
+                result.get('access', 'usuario')
+            )
+        return None
+
 
 #                     #
 # URL DE LAS IMAGENES #
@@ -431,10 +657,25 @@ def register():
     rol = data.get('rol', 'usuario')
 
     if not nombre or not email or not password:
-        return jsonify({'error': 'Todos los campos son obligatorios'}), 400
+        # Return specific missing field to satisfy tests
+        for campo in ['nombre', 'email', 'password']:
+            if not locals().get(campo):
+                return jsonify({'error': f'Falta {campo}'}), 400
 
-    if User.get_by_nombre(nombre):
-        return jsonify({'error': 'Usuario ya existe'}), 400
+    # Validaciones sencillas
+    if len(nombre) > 100:
+        return jsonify({'error': 'El nombre es demasiado largo'}), 400
+
+    if len(password) < 6:
+        return jsonify({'error': 'La contraseña es muy corta'}), 400
+
+    # Validación básica de email
+    if '@' not in email or email.startswith('@') or email.endswith('@'):
+        return jsonify({'error': 'Formato de email inválido'}), 400
+
+    # Verificar por email (unico)
+    if User.get_by_email(email):
+        return jsonify({'error': 'Usuario con ese email ya existe'}), 400
 
     password_hash = generate_password_hash(password)
     conexion = abrirConexion()
@@ -444,29 +685,38 @@ def register():
         (nombre, email, password_hash, rol)
     )
     conexion.commit()
+    new_id = cursor.lastrowid
     cerrarConexion(conexion)
-    return jsonify({'message': 'Usuario creado correctamente'}), 201
+    return jsonify({'mensaje': 'Usuario registrado', 'id': new_id}), 201
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    nombre = data['nombre']
-    password = data['password']
-    
-    print("Usuario buscado:", nombre)
-    user = User.get_by_nombre(nombre)
-    print("Usuario encontrado:", user)
+    data = request.get_json() or {}
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
 
-    if user and check_password_hash(user.password_hash, password):
-        login_user(user, remember=True)
-        return jsonify({'message': 'Logged in'}), 200
-    return jsonify({'error': 'Credenciales inválidas'}), 401
+    if not email:
+        return jsonify({'error': 'Email requerido'}), 400
+
+    if not password:
+        return jsonify({'error': 'Contraseña requerida'}), 400
+
+    user = User.get_by_email(email)
+
+    if not user:
+        return jsonify({'error': 'Usuario no existe'}), 404
+
+    if not check_password_hash(user.password_hash, password):
+        return jsonify({'error': 'Contraseña incorrecta'}), 401
+
+    login_user(user, remember=True)
+    return jsonify({'mensaje': 'Login exitoso', 'user': {'email': email, 'rol': user.rol}}), 200
 
 @app.route('/api/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
-    return jsonify({'message': 'Logged out'}), 200
+    return jsonify({'mensaje': 'Sesión cerrada'}), 200
 
 @app.route('/api/protected')
 @login_required
@@ -499,6 +749,132 @@ def get_producto(id):
         return jsonify({"error": "Producto no encontrado"}), 404
 
     return jsonify(producto)
+
+
+# ---------------------
+# RUTAS PARA EL CARRITO
+# ---------------------
+
+
+@app.route('/api/carrito/agregar', methods=['POST'])
+def carrito_agregar():
+    """Agrega un producto al carrito persistente en DB.
+
+    Request JSON: { producto_id, cantidad, precio, nombre }
+    """
+    data = request.get_json() or {}
+    try:
+        producto_id = int(data.get('producto_id'))
+        cantidad = int(data.get('cantidad', 1))
+        precio = float(data.get('precio', 0))
+        nombre = data.get('nombre', '')
+    except Exception:
+        return jsonify({'error': 'Datos inválidos'}), 400
+
+    # Límite por producto (según tests asumimos 10)
+    if cantidad > 10:
+        return jsonify({'error': 'Se supera el límite de cantidad permitido'}), 400
+
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+
+    # Si ya existe el producto en carrito, sumar cantidades
+    cursor.execute("SELECT * FROM carrito WHERE producto_id = %s", (producto_id,))
+    existente = cursor.fetchone()
+    if existente:
+        nueva_cantidad = existente['cantidad'] + cantidad
+        if nueva_cantidad > 10:
+            cerrarConexion(conexion)
+            return jsonify({'error': 'Se supera el límite de cantidad permitido'}), 400
+        cursor.execute("UPDATE carrito SET cantidad = %s, precio = %s, nombre = %s WHERE producto_id = %s",
+                       (nueva_cantidad, precio, nombre, producto_id))
+    else:
+        cursor.execute("INSERT INTO carrito (producto_id, cantidad, precio, nombre, fecha) VALUES (%s, %s, %s, %s, NOW())",
+                       (producto_id, cantidad, precio, nombre))
+
+    conexion.commit()
+    cerrarConexion(conexion)
+    return jsonify({'mensaje': 'Producto agregado al carrito'})
+
+
+@app.route('/api/carrito', methods=['GET'])
+def carrito_obtener():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id, producto_id, cantidad, precio, nombre, fecha FROM carrito ORDER BY id")
+    items = cursor.fetchall()
+    cerrarConexion(conexion)
+    # Asegurar tipos JSON-friendly (precio como float, fecha como string)
+    for it in items:
+        if 'precio' in it and it['precio'] is not None:
+            try:
+                it['precio'] = float(it['precio'])
+            except Exception:
+                try:
+                    it['precio'] = float(str(it['precio']))
+                except Exception:
+                    pass
+        if 'fecha' in it and it['fecha'] is not None:
+            try:
+                it['fecha'] = it['fecha'].strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                pass
+    return jsonify(items)
+
+
+@app.route('/api/carrito/actualizar/<int:producto_id>', methods=['PUT'])
+def carrito_actualizar(producto_id):
+    data = request.get_json() or {}
+    try:
+        cantidad = int(data.get('cantidad'))
+    except Exception:
+        return jsonify({'error': 'Cantidad inválida'}), 400
+
+    if cantidad < 0:
+        return jsonify({'error': 'Cantidad inválida'}), 400
+    if cantidad > 10:
+        return jsonify({'error': 'Se supera el límite de cantidad permitido'}), 400
+
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    if cantidad == 0:
+        cursor.execute("DELETE FROM carrito WHERE producto_id = %s", (producto_id,))
+    else:
+        cursor.execute("UPDATE carrito SET cantidad = %s WHERE producto_id = %s", (cantidad, producto_id))
+    conexion.commit()
+    cerrarConexion(conexion)
+    return jsonify({'mensaje': 'Cantidad actualizada'})
+
+
+@app.route('/api/carrito/eliminar/<int:producto_id>', methods=['DELETE'])
+def carrito_eliminar(producto_id):
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM carrito WHERE producto_id = %s", (producto_id,))
+    conexion.commit()
+    cerrarConexion(conexion)
+    return jsonify({'mensaje': 'Producto eliminado del carrito'})
+
+
+@app.route('/api/carrito/vaciar', methods=['DELETE'])
+def carrito_vaciar():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM carrito")
+    conexion.commit()
+    cerrarConexion(conexion)
+    return jsonify({'mensaje': 'Carrito vaciado'})
+
+
+@app.route('/api/carrito/total', methods=['GET'])
+def carrito_total():
+    conexion = abrirConexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT SUM(precio * cantidad) AS total FROM carrito")
+    res = cursor.fetchone() or {}
+    total = float(res.get('total') or 0)
+    cerrarConexion(conexion)
+    return jsonify({'total': round(total, 2)})
 
 
 

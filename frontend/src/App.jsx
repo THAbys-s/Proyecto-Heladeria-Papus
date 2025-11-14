@@ -13,7 +13,11 @@ import { AuthProvider } from "./components/Auth/Auth";
 import Productos from "./components/Productos/Productos";
 import HazTuHelado from "./components/HazTuHelado/HazTuHelado";
 import Sucursales from "./components/Sucursales/Sucursales";
+<<<<<<< HEAD
 import PanelAdmin from "./pages/PanelAdmin";
+=======
+import FormularioEmpleo from "./components/FormularioEmpleo/FormularioEmpleo";
+>>>>>>> Diego
 
 /*
 #FF6E72
@@ -121,6 +125,18 @@ function App() {
 
           {/* Página 404 */}
           <Route path="*" element={<NotFound />} />
+
+          {/* Ruta formulario de empleo */}
+          <Route
+            path="/formulario-solicitud-empleo"
+            element={
+              <PageWithLoading>
+                <MainLayout>
+                  <FormularioEmpleo />
+                </MainLayout>
+              </PageWithLoading>
+            }
+          />
 
           {/*Rutas de Login, Register y Auth */}
           <Route path="/login" element={<LoginPage />} />
