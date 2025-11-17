@@ -655,7 +655,7 @@ def register():
     email = data.get('email', '').strip()
     password = data.get('password', '').strip()
     rol = data.get('rol', 'usuario')
-
+    
     if not nombre or not email or not password:
         # Return specific missing field to satisfy tests
         for campo in ['nombre', 'email', 'password']:
@@ -689,28 +689,21 @@ def register():
     cerrarConexion(conexion)
     return jsonify({'mensaje': 'Usuario registrado', 'id': new_id}), 201
 
+
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.get_json() or {}
-    email = data.get('email', '').strip()
-    password = data.get('password', '')
+    data = request.get_json()
+    nombre = data['nombre']
+    password = data['password']
+    
+    print("Usuario buscado:", nombre)
+    user = User.get_by_nombre(nombre)
+    print("Usuario encontrado:", user)
 
-    if not email:
-        return jsonify({'error': 'Email requerido'}), 400
-
-    if not password:
-        return jsonify({'error': 'Contraseña requerida'}), 400
-
-    user = User.get_by_email(email)
-
-    if not user:
-        return jsonify({'error': 'Usuario no existe'}), 404
-
-    if not check_password_hash(user.password_hash, password):
-        return jsonify({'error': 'Contraseña incorrecta'}), 401
-
-    login_user(user, remember=True)
-    return jsonify({'mensaje': 'Login exitoso', 'user': {'email': email, 'rol': user.rol}}), 200
+    if user and check_password_hash(user.password_hash, password):
+        login_user(user, remember=True)
+        return jsonify({'message': 'Logged in'}), 200
+    return jsonify({'error': 'Credenciales inválidas'}), 401
 
 @app.route('/api/logout', methods=['POST'])
 @login_required

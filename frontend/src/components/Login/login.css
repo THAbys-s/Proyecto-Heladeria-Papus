@@ -9,14 +9,13 @@
 
 /* Contenedor del formulario */
 .form {
-  width: 500px;
-  padding: 30px;
+  width: 350px;          /* tamaño equilibrado */
+  padding: 25px 18px;    /* evita que los inputs se salgan */
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 /* Contenedor de cada input */
@@ -28,7 +27,6 @@
 
 /* Inputs */
 .form-item input {
-  display: block;
   width: 100%;
   height: 40px;
   background: transparent;
@@ -51,113 +49,8 @@
   left: 15px;
   font-size: 12px;
   font-weight: bold;
-  padding: 0 2px;
   color: rgb(44, 42, 42);
-  cursor: text;
-  transition: all 0.3s ease;
-  user-select: none;
   pointer-events: none;
-}
-
-.form-item input:focus + label,
-.form-item input:valid + label {
-  font-size: 11px;
-  top: -20px;
-  color: black;
-}
-
-/* Select */
-select {
-  width: 100%;
-  height: 40px;
-  border: 1px solid black;
-  border-radius: 6px;
-  background: transparent;
-  padding: 0 15px;
-  font-size: 14px;
-  color: black;
-}
-
-/* Botón */
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #ff6e72;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background-color: #ff4c5b;
-}
-
-.boton {
-  display: flex;
-  justify-content: center;
-}
-
-/* === ESTILO UNIFICADO AL DE REGISTER === */
-
-/* Wrapper general */
-.form-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #f5f5f5;
-}
-
-/* Contenedor del formulario */
-.form {
-  width: 500px;
-  padding: 30px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Contenedor de cada input */
-.form-item {
-  position: relative;
-  margin-bottom: 20px;
-  width: 100%;
-}
-
-/* Inputs */
-.form-item input {
-  display: block;
-  width: 100%;
-  height: 40px;
-  background: transparent;
-  border: 1px solid black;
-  padding: 0 15px;
-  font-size: 14px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  color: black;
-}
-
-.form-item input:focus {
-  border-color: black;
-}
-
-/* Label flotante */
-.form-item label {
-  position: absolute;
-  top: 10px;
-  left: 15px;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 0 2px;
-  color: rgb(44, 42, 42);
-  cursor: text;
   transition: all 0.3s ease;
 }
 
@@ -165,18 +58,6 @@ button:hover {
 .form-item input:valid + label {
   font-size: 11px;
   top: -20px;
-  color: black;
-}
-
-/* Select */
-select {
-  width: 100%;
-  height: 40px;
-  border: 1px solid black;
-  border-radius: 6px;
-  background: transparent;
-  padding: 0 15px;
-  font-size: 14px;
   color: black;
 }
 

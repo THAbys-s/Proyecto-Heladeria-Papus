@@ -2,6 +2,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../Auth/Auth";
 import { useNavigate } from "react-router-dom";
+import "./login.css";
 
 const LoginPage = () => {
   const { login } = useContext(AuthContext);
@@ -18,22 +19,39 @@ const LoginPage = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Nombre"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit">Login</button>
+    <div className="form-wrapper">
+      <form onSubmit={handleSubmit} className="form">
+
+        <div className="form-item">
+          <input
+            type="text"
+            placeholder=" "
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            required
+          />
+          <label>Nombre</label>
+        </div>
+
+        <div className="form-item">
+          <input
+            type="password"
+            placeholder=" "
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <label>Contraseña</label>
+        </div>
+
+        <div className="boton">
+          <button type="submit">Login</button>
+        </div>
+
+      </form>
+
       {error && <p>{error}</p>}
-    </form>
+    </div>
   );
 };
 
